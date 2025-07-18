@@ -1,5 +1,6 @@
 {
   "expo": {
+    "scheme": "flexifit", // flexifit:// for deep linking
     "name": "flexifit",
     "slug": "flexifit",
     "version": "1.0.0",
@@ -24,6 +25,9 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-router"
+    ]
   }
 }
