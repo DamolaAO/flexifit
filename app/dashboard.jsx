@@ -1,29 +1,15 @@
-import { StyleSheet, Text, View, Image } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import Logo from '../assets/img/FlixiFit App Logo.png'
-import { Link } from 'expo-router'
 
-const Home = () => {
+const Dashboard = () => {
   return (
     <View style={styles.container}>
-      <Image source={Logo} style={styles.logo} />
-      <Text style={styles.title}>FlexiFit</Text>
-      <Text style={styles.subtitle}>Welcome to Flexifit</Text>
-      <Text style = {{marginTop: 30, marginBottom: 30}}>
-        Start your fitness journey today!
-        </Text>
-
-      <View >
-        <Link href="/dashboard" style={styles.card}>
-          Go to Dashboard
-        </Link>
-      </View>
-      
+      <Text style={styles.title}>Dashboard</Text>
     </View>
   )
 }
 
-export default Home
+export default Dashboard
 
 const styles = StyleSheet.create({
   container: {
