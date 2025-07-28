@@ -1,11 +1,13 @@
-import { StyleSheet, Text, View, Image } from 'react-native'
+import { StyleSheet, Text, View, Image, useColorScheme } from 'react-native'
 import React from 'react'
 import Logo from '../assets/img/FlixiFit App Logo.png'
 import { Link } from 'expo-router'
+import { Colours } from '../constants/Colours' // Colours.js file for color constants
+import ThemedView from '../components/ThemedView'
 
 const Home = () => {
   return (
-    <View style={styles.container}>
+    <ThemedView style={styles.container}>
       <Image source={Logo} style={styles.logo} />
       <Text style={styles.title}>FlexiFit</Text>
       <Text style={styles.subtitle}>Welcome to Flexifit</Text>
@@ -19,7 +21,7 @@ const Home = () => {
         </Link>
       </View>
       
-    </View>
+    </ThemedView>
   )
 }
 
