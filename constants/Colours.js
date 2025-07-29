@@ -5,11 +5,11 @@ export const Colours = {
   dark: {
     text: "#d4d4d4",
     title: "#fff",
-    background: "#252231",
-    navBackground: "#201e2b",
+    background: "#111827",
+    navBackground: "#0C1420",
     iconColor: "#9591a5",
     iconColorFocused: "#fff",
-    uiBackground: "#2f2b3d",
+    uiBackground: "#1f2937",
   },
 
   light: {

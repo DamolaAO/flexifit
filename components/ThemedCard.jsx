@@ -8,7 +8,7 @@ const ThemedCard = ({ style, ...props }) => {
 
     return (
         <View 
-            style={[{ flex: 1, backgroundColor: theme.background }, styles.card, style]}
+            style={[{ backgroundColor: theme.uiBackground }, styles.card, style]}
             {...props}/>
     )
 }

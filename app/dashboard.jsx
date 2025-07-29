@@ -1,11 +1,17 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Image } from 'react-native'
 import React from 'react'
+import { Link } from 'expo-router'
+import ThemedView from '../components/ThemedView'
+import ThemedLogo from '../components/ThemedLogo'
+import ThemedCard from '../components/ThemedCard'
+import ThemedText from '../components/ThemedText'
+import Spacer from '../components/Spacer'
 
 const Dashboard = () => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Dashboard</Text>
-    </View>
+    <ThemedView style={styles.container}>
+      <ThemedText style={styles.title}>Dashboard</ThemedText>
+    </ThemedView>
   )
 }
 
@@ -20,11 +26,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 16,
   },
   subtitle: {
     fontSize: 16,
-    color: 'gray',
+    color: '#4b5563',
   },
   card: {
     width: '90%',

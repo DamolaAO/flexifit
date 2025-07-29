@@ -1,25 +1,46 @@
-import { StyleSheet, Text, View, Image, useColorScheme } from 'react-native'
+import { StyleSheet, Text } from 'react-native'
 import React from 'react'
-import Logo from '../assets/img/FlixiFit App Logo.png'
+//import Logo from '../assets/img/flexifit dark logo.png'
 import { Link } from 'expo-router'
 import { Colours } from '../constants/Colours' // Colours.js file for color constants
 import ThemedView from '../components/ThemedView'
+import ThemedLogo from '../components/ThemedLogo'
+import ThemedCard from '../components/ThemedCard'
+import ThemedText from '../components/ThemedText'
+import Spacer from '../components/Spacer' // Importing Spacer component for layout spacing
 
 const Home = () => {
   return (
     <ThemedView style={styles.container}>
-      <Image source={Logo} style={styles.logo} />
-      <Text style={styles.title}>FlexiFit</Text>
-      <Text style={styles.subtitle}>Welcome to Flexifit</Text>
-      <Text style = {{marginTop: 30, marginBottom: 30}}>
-        Start your fitness journey today!
-        </Text>
+      <ThemedLogo style={styles.logo} />
+      <Spacer height={20} />
+      <ThemedText style={styles.title}>FlexiFit</ThemedText>
+      <Spacer height={10} />
+      <ThemedText style={styles.subtitle}>Welcome to FlexiFit</ThemedText>
+      <Spacer/>
 
-      <View >
-        <Link href="/dashboard" style={styles.card}>
-          Go to Dashboard
+      <ThemedText>Start your fitness journey today!</ThemedText>
+      <Spacer height={20} />
+
+      <ThemedCard>
+        <Link href="/dashboard">
+          <ThemedText>Go to Dashboard</ThemedText>
         </Link>
-      </View>
+      </ThemedCard>
+      <Spacer height={10} />
+      
+      <ThemedCard>
+        <Link href="/login">
+          <ThemedText>Go to Login</ThemedText>
+        </Link>
+      </ThemedCard>
+      <Spacer height={10} />
+
+      <ThemedCard>
+        <Link href="/register">
+          <ThemedText>Go to Register</ThemedText>
+        </Link>
+      </ThemedCard>
       
     </ThemedView>
   )
@@ -36,11 +57,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 16,
   },
   subtitle: {
     fontSize: 16,
-    color: 'gray',
+    color: '#979eaa'
   },
   card: {
     width: '90%',
@@ -57,7 +77,6 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   logo: {
-    marginVertical: 20,
     width: 100,
     height: 100,
   }

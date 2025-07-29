@@ -1,4 +1,4 @@
-import { View, StyleSheet, useColorScheme } from 'react-native'
+import { View, Text, useColorScheme } from 'react-native'
 import React from 'react'
 import { Colours } from '../constants/Colours'
 
@@ -7,7 +7,7 @@ const ThemedView = ({ style, ...props }) => {
     const theme = Colours[colourScheme] ?? Colours.light // Fallback to light theme if scheme is not recognized
     return (
         <View 
-            style={[{ flex: 1, backgroundColor: theme.background }, style]}
+            style={[{ backgroundColor: theme.background }, style]}
             {...props}/>
     )
 }
