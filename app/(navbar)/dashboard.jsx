@@ -8,7 +8,7 @@ import Spacer from '../../components/Spacer'
 
 const dashboard = () => {
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView style={styles.container} safe={true}>
 
       <ThemedText title={true} style={styles.title}>Dashboard</ThemedText>
       <Spacer />
@@ -22,7 +22,7 @@ export default dashboard
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    //justifyContent: 'center',
     alignItems: 'center',
   },
   title: {

@@ -1,5 +1,6 @@
 import { Tabs } from 'expo-router'
 import React from 'react'
+import ThemedText from '../../components/ThemedText'
 import { Colours } from '../../constants/Colours' // Colours.js file for color constants
 import { useColorScheme } from 'react-native'
 import { icon } from 'react-native-vector-icons/Ionicons'
@@ -31,47 +32,62 @@ const NavbarLayout = () => {
     >
       <Tabs.Screen 
       name="meals" 
-      options={{ title: 'Meals', tabBarIcon: ({ focused }) => (
-        <MaterialCommunityIcons name="food-turkey" 
-        size={24} 
-        color={focused ? theme.iconColorFocused : theme.iconColor} />
-      ) }}
+      options={{ 
+        title: 'Meals', 
+        tabBarIcon: ({ focused }) => (
+          <MaterialCommunityIcons name="food-turkey" 
+          color={focused ? theme.iconColorFocused : theme.iconColor}
+          size={34} />
+        )
+      }}
       />
 
       <Tabs.Screen 
       name="fitness" 
-      options={{ title: 'Fitness', tabBarIcon: ({ focused}) => (
-        <FontAwesome6 name="dumbbell" 
-        size={24} 
-        color={focused ? theme.iconColorFocused : theme.iconColor} />
-      ) }}
+      options={{ 
+        title: 'Fitness', 
+        tabBarIcon: ({ focused}) => (
+          <FontAwesome6 name="dumbbell" 
+          color={focused ? theme.iconColorFocused : theme.iconColor}
+          size={24} />
+        )
+      }}
       />
 
       <Tabs.Screen 
       name="dashboard" 
-      options={{ title: 'Dashboard', tabBarIcon: ({ focused }) => (
-        <Octicons name="graph"
-        size={24}
-        color={focused ? theme.iconColorFocused : theme.iconColor} />
-      ) }}
+      options={{ 
+        title: 'Dashboard',
+        tabBarIcon: ({ focused }) => (
+          <Octicons name="graph"
+            color={focused ? theme.iconColorFocused : theme.iconColor}
+            size={24} />
+        )
+      }}
       />
 
       <Tabs.Screen 
       name="chatbot" 
-      options={{ title: 'Chatbot', tabBarIcon: ({ focused }) => (
-        <MaterialCommunityIcons name={focused ? "robot-happy" : "robot-happy-outline"} 
-        size={24} 
-        color={focused ? theme.iconColorFocused : theme.iconColor} />
-      ) }} 
+      options={{ 
+        title: 'Chatbot', 
+        tabBarIcon: ({ focused }) => (
+          <MaterialCommunityIcons name={focused ? "robot-happy" : "robot-happy-outline"} 
+          color={focused ? theme.iconColorFocused : theme.iconColor} 
+          size={24} />
+        ) 
+      }} 
       />
 
       <Tabs.Screen 
       name="info" 
-      options={{ title: 'Info', tabBarIcon: ({ focused }) => (
-        <Ionicons name={focused ? "information-circle" : "information-circle-outline"}
-        size={24} 
-        color={focused ? theme.iconColorFocused : theme.iconColor} />
-      ) }} 
+      options={{ 
+        title: 'Info', 
+        tabBarIcon: ({ focused }) => (
+          <Ionicons name={focused ? "information-circle" : "information-circle-outline"}
+          color={focused ? theme.iconColorFocused : theme.iconColor}
+          size={28} />
+        ) 
+      }} 
       />
 
     </Tabs>

@@ -8,7 +8,7 @@ import Spacer from '../../components/Spacer'
 
 const chatbot = () => {
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView style={styles.container} safe={true}>
 
       <ThemedText title={true} style={styles.title}>Chatbot</ThemedText>
       <Spacer />
