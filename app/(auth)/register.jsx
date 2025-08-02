@@ -30,11 +30,6 @@ const register = () => {
         
         <ThemedText>Register Form Placeholder</ThemedText>
         <Spacer height={10} />
-        <ThemedCard>
-            <Link href="/index">
-                <ThemedText>Back Home</ThemedText>
-            </Link>
-        </ThemedCard>
     </ThemedView>
   )
 }

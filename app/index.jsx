@@ -21,13 +21,6 @@ const Home = () => {
 
       <ThemedText>Start your fitness journey today!</ThemedText>
       <Spacer height={20} />
-
-      <ThemedCard>
-        <Link href="/dashboard">
-          <ThemedText>Go to Dashboard</ThemedText>
-        </Link>
-      </ThemedCard>
-      <Spacer height={10} />
       
       <ThemedCard>
         <Link href="/login">
@@ -41,6 +34,15 @@ const Home = () => {
           <ThemedText>Go to Register</ThemedText>
         </Link>
       </ThemedCard>
+      <Spacer height={10} />
+
+      <ThemedCard>
+        <Link href="/dashboard">
+          <ThemedText>Go to Dashboard</ThemedText>
+        </Link>
+      </ThemedCard>
+      <Spacer height={10} />
+      
       
     </ThemedView>
   )

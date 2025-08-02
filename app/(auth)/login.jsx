@@ -71,7 +71,6 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   btn: {
-    backgroundColor: Colours.dark.navBackground,
     padding: 16,
     borderRadius: 5,
   },
