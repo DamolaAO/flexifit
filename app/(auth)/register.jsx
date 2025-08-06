@@ -1,5 +1,7 @@
 import { StyleSheet } from 'react-native'
 import { Link } from 'expo-router'
+import { useState } from 'react'
+import { Keyboard } from 'react-native'
 
 import React from 'react'
 import ThemedView from '../../components/ThemedView'
@@ -7,30 +9,51 @@ import ThemedCard from '../../components/ThemedCard'
 import ThemedText from '../../components/ThemedText'
 import Spacer from '../../components/Spacer'
 import ThemedButton from '../../components/ThemedButton'
+import ThemedTextInput from '../../components/ThemedTextInput'
 
 const register = () => {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
 
     const handleSubmit = () => {
-        console.log("Register button pressed");
+        console.log("Register button pressed: ", email, password);
     }
 
   return (
-    <ThemedView style={styles.container}>
-        
-        <Spacer />
-        <ThemedText title={true}>
-            Register as new User
-        </ThemedText>
-        <Spacer height={100} />
+    <TouchableWithoutFeedback onPress={() => {Keyboard.dismiss()}}>
+      <ThemedView style={styles.container}>
+          
+          <Spacer />
+          <ThemedText title={true}>
+              Register as new User
+          </ThemedText>
+          <Spacer height={80} />
 
-        <ThemedButton style={styles.btn} onPress={handleSubmit}>
-            <ThemedText>Register</ThemedText>
-        </ThemedButton>
-        <Spacer height={10} />
-        
-        <ThemedText>Register Form Placeholder</ThemedText>
-        <Spacer height={10} />
-    </ThemedView>
+          <ThemedTextInput
+            style={{ width: '80%', marginBottom: 20 }}
+            placeholder="Email"
+            keyboardType="email-address"
+          autoCapitalize="none"
+          onChangeText={setEmail}
+          value={email}
+          />
+
+          <ThemedTextInput
+            style={{ width: '80%', marginBottom: 20 }}
+            placeholder="Password"
+            secureTextEntry
+            onChangeText={setPassword}
+            value={password}
+          />
+          <Spacer height={10} />
+
+          <ThemedButton style={styles.btn} onPress={handleSubmit}>
+              <ThemedText>Register</ThemedText>
+          </ThemedButton>
+          <Spacer height={10} />
+          
+      </ThemedView>
+    </TouchableWithoutFeedback>
   )
 }
 

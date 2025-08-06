@@ -1,5 +1,7 @@
-import { Pressable, StyleSheet } from 'react-native'
+import { StyleSheet, TouchableWithoutFeedback } from 'react-native'
 import { Link } from 'expo-router'
+import { useState } from 'react'
+import { Keyboard } from 'react-native'
 
 import React from 'react'
 import ThemedView from '../../components/ThemedView'
@@ -8,39 +10,60 @@ import ThemedText from '../../components/ThemedText'
 import Spacer from '../../components/Spacer'
 import { Colours } from '../../constants/Colours'
 import ThemedButton from '../../components/ThemedButton'
+import ThemedTextInput from '../../components/ThemedTextInput'
 
-const login = () => {
+const Login = () => {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
 
     const handleSubmit = () => {
-        console.log("Login button pressed");
+        console.log("Login button pressed: ", email, password);
     }
 
   return (
-    <ThemedView style={styles.container}>
-        
+    <TouchableWithoutFeedback onPress={() => {Keyboard.dismiss()}}>
+      <ThemedView style={styles.container}>
+
         <Spacer />
         <ThemedText title={true}>
             Login to Your Account
         </ThemedText>
-        <Spacer height={100} />
+        <Spacer height={80} />
+
+        <ThemedTextInput
+          style={{ width: '80%', marginBottom: 20 }}
+          placeholder="Email"
+          keyboardType="email-address"
+          autoCapitalize="none"
+          onChangeText={setEmail}
+          value={email}
+        />
+
+        <ThemedTextInput
+          style={{ width: '80%', marginBottom: 20 }}
+          placeholder="Password"
+          secureTextEntry
+          onChangeText={setPassword}
+          value={password}
+        />
+        <Spacer height={10} />
 
         <ThemedButton style={styles.btn} onPress={handleSubmit}>
             <ThemedText>Login</ThemedText>
         </ThemedButton>
         <Spacer height={10} />
         
-        <ThemedText>Login Form Placeholder</ThemedText>
-        <Spacer height={20} />
         <ThemedCard>
             <Link href="/register">
-                <ThemedText>Register</ThemedText>
+                <ThemedText>Register instead</ThemedText>
             </Link>
         </ThemedCard>
-    </ThemedView>
+      </ThemedView>
+    </TouchableWithoutFeedback>
   )
 }
 
-export default login
+export default Login
 
 const styles = StyleSheet.create({
   container: {

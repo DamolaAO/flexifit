@@ -9,7 +9,7 @@ function ThemedButton({ style, ...props }) {
   return (
     <Pressable 
         style={({ pressed }) => [styles.btn, pressed && styles.pressed, 
-        { backgroundColor: theme.navBackground }, style]} 
+        { backgroundColor: theme.uiBackground }, style]} 
         {...props}
     />
   );
