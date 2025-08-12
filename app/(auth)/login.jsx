@@ -2,6 +2,7 @@ import { StyleSheet, TouchableWithoutFeedback } from 'react-native'
 import { Link } from 'expo-router'
 import { useState } from 'react'
 import { Keyboard } from 'react-native'
+import { useAuth } from '../../hooks/useAuth'
 
 import React from 'react'
 import ThemedView from '../../components/ThemedView'
@@ -16,9 +17,12 @@ const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
-    const handleSubmit = () => {
-        console.log("Login button pressed: ", email, password);
-    }
+  const { user } = useAuth // Accessing user from AuthContext
+
+  const handleSubmit = () => {
+    console.log("User: ", user);
+    console.log("Login button pressed: ", email, password);
+  }
 
   return (
     <TouchableWithoutFeedback onPress={() => {Keyboard.dismiss()}}>
