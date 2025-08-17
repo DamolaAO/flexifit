@@ -1,27 +1,45 @@
-import { StyleSheet, TouchableWithoutFeedback } from 'react-native'
+import { StyleSheet, TouchableWithoutFeedback, Alert } from 'react-native'
 import { Link } from 'expo-router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Keyboard } from 'react-native'
 import { useAuth } from '../../hooks/useAuth'
+import { useRouter } from 'expo-router'
 
 import React from 'react'
 import ThemedView from '../../components/ThemedView'
-import ThemedCard from '../../components/ThemedCard'
 import ThemedText from '../../components/ThemedText'
 import Spacer from '../../components/Spacer'
-import { Colours } from '../../constants/Colours'
 import ThemedButton from '../../components/ThemedButton'
 import ThemedTextInput from '../../components/ThemedTextInput'
 
+
+
 const Login = () => {
+  const { login, user, loading } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const router = useRouter()
 
-  const { user } = useAuth // Accessing user from AuthContext
+  useEffect(() => {
+    if (user) {
+      router.replace('/(navbar)/dashboard')
+    }
+  }, [user, router])
 
-  const handleSubmit = () => {
-    console.log("User: ", user);
-    console.log("Login button pressed: ", email, password);
+  const handleSubmit =  async () => {
+    try {
+      await login(email, password)
+    } catch (err) {
+      if (err.code === "auth/invalid-credential") {
+        Alert.alert("Login failed", "Invalid email or password.")
+      } else if (err.code === "auth/invalid-email") {
+        Alert.alert("Login failed", "Invalid email format.")
+      } else {
+        Alert.alert("Login failed", err.message) // fallback
+      }
+    }
+    console.log("User: ", user)
+    console.log("Login button pressed: ", email, password)
   }
 
   return (
@@ -55,13 +73,16 @@ const Login = () => {
         <ThemedButton style={styles.btn} onPress={handleSubmit}>
             <ThemedText>Login</ThemedText>
         </ThemedButton>
+        <Spacer height={50} />
+
+        <Link href="/forgotPassword">
+            <ThemedText>Forgot Password?</ThemedText>
+        </Link>
         <Spacer height={10} />
-        
-        <ThemedCard>
-            <Link href="/register">
-                <ThemedText>Register instead</ThemedText>
-            </Link>
-        </ThemedCard>
+
+        <Link href="/register">
+            <ThemedText>Register instead</ThemedText>
+        </Link>
       </ThemedView>
     </TouchableWithoutFeedback>
   )

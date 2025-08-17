@@ -1,7 +1,8 @@
-import { StyleSheet } from 'react-native'
+import { StyleSheet, TouchableWithoutFeedback } from 'react-native'
 import { Link } from 'expo-router'
 import { useState } from 'react'
 import { Keyboard } from 'react-native'
+import { useAuth } from '../../hooks/useAuth'
 
 import React from 'react'
 import ThemedView from '../../components/ThemedView'
@@ -12,11 +13,17 @@ import ThemedButton from '../../components/ThemedButton'
 import ThemedTextInput from '../../components/ThemedTextInput'
 
 const register = () => {
+  const { register } = useAuth();
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
-    const handleSubmit = () => {
-        console.log("Register button pressed: ", email, password);
+    const handleSubmit = async () => {
+      try {
+        await register(email, password);
+      } catch (error) {
+        console.error("Registration failed:", error);
+      }
+      console.log("Register button pressed: ", email, password);
     }
 
   return (
