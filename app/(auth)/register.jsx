@@ -1,4 +1,4 @@
-import { StyleSheet, TouchableWithoutFeedback } from 'react-native'
+import { StyleSheet, TouchableWithoutFeedback, Alert} from 'react-native'
 import { Link } from 'expo-router'
 import { useState } from 'react'
 import { Keyboard } from 'react-native'
@@ -21,7 +21,7 @@ const register = () => {
       try {
         await register(email, password);
       } catch (error) {
-        console.error("Registration failed:", error);
+        Alert.alert("Registration failed", error.message);
       }
       console.log("Register button pressed: ", email, password);
     }

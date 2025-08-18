@@ -2,6 +2,8 @@ import { createContext, useEffect } from "react";
 import { useState } from "react";
 import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail, updateProfile } from "firebase/auth";
 import { auth } from "..//firebase/firebaseConfig";
+import { setDoc, getDoc, doc } from "firebase/firestore";
+import { db } from "../firebase/firebaseConfig";
 
 export const AuthContext = createContext();
 
@@ -25,6 +27,7 @@ export function AuthProvider({ children }) {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email.trim(), password);
       setUser(userCredential.user);
+      await ensureUserDoc(userCredential.user);
     } catch (err) {
       setError(err.code || err.message);
       throw err;
@@ -59,15 +62,36 @@ export function AuthProvider({ children }) {
     }
   };
 
+  async function ensureUserDoc(user) {
+    const ref = doc(db, "users", user.uid);
+    const snap = await getDoc(ref);
+
+    const baseUserData = {
+      email: user.email,
+      createdAt: new Date().toISOString(),
+      name: "",
+      age: null,
+      height: null,
+      weight: null,
+      fitnessGoal: "",
+      fitnessLevel: ""
+    };
+
+    await setDoc(ref, snap.exists() ? {} : baseUserData, { merge: true });
+  }
+
   async function register(email, password) {
     setLoading(true);
     setError(null);
     try {
       const cred = await createUserWithEmailAndPassword(auth, email.trim(), password);
+      await ensureUserDoc(cred.user);
 
       const displayName = email.split("@")[0];
 
       await updateProfile(cred.user, { displayName });
+
+      return cred.user;
     } catch (err) {
       setError(err.message);
       throw err;

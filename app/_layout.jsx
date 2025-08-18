@@ -13,7 +13,6 @@ function AuthGate() {
   const { user, initializing } = useAuth()
   const router = useRouter()
   const [showSplash, setShowSplash] = useState(true)
-
   useEffect(() => {
     if (initializing) return;
 
