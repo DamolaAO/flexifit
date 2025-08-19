@@ -8,10 +8,7 @@ import { AuthProvider } from '../context/AuthContext'
 import { useAuth } from '../hooks/useAuth'
 import ThemedSplash from '../components/ThemedSplash'
 import ThemedView from '../components/ThemedView'
-import { needsOnboarding } from '../lib/onboarding'
-import { onAuthStateChanged } from 'firebase/auth'
 import { doc, getDoc } from 'firebase/firestore'
-import { auth, db } from '../firebase/firebaseConfig'
 
 function AuthGate() {
   const { user, initializing } = useAuth()

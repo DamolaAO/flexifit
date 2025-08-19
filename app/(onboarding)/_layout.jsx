@@ -2,10 +2,7 @@ import React from 'react'
 import { StyleSheet } from 'react-native'
 import { useEffect, useState } from 'react'
 import { Stack, useRouter } from 'expo-router'
-import { doc, getDoc } from 'firebase/firestore'
-import { db } from '../../firebase/firebaseConfig'
 import { useAuth } from '../../hooks/useAuth'
-import { needsOnboarding } from '../../lib/onboarding'
 
 
 const OnboardingLayout = () => {
