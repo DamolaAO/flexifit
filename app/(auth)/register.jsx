@@ -23,7 +23,6 @@ const register = () => {
       } catch (error) {
         Alert.alert("Registration failed", error.message);
       }
-      console.log("Register button pressed: ", email, password);
     }
 
   return (

@@ -38,8 +38,6 @@ const Login = () => {
         Alert.alert("Login failed", err.message) // fallback
       }
     }
-    console.log("User: ", user)
-    console.log("Login button pressed: ", email, password)
   }
 
   return (

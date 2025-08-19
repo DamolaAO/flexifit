@@ -8,28 +8,71 @@ import { AuthProvider } from '../context/AuthContext'
 import { useAuth } from '../hooks/useAuth'
 import ThemedSplash from '../components/ThemedSplash'
 import ThemedView from '../components/ThemedView'
+import { needsOnboarding } from '../lib/onboarding'
+import { onAuthStateChanged } from 'firebase/auth'
+import { doc, getDoc } from 'firebase/firestore'
+import { auth, db } from '../firebase/firebaseConfig'
 
 function AuthGate() {
   const { user, initializing } = useAuth()
   const router = useRouter()
   const [showSplash, setShowSplash] = useState(true)
+  const [loadingDoc, setLoadingDoc] = useState(false);
+  const [userDoc, setUserDoc] = useState(null)
+
+  useEffect(() => {
+    let cancelled = false
+
+    if (!user) {
+      setUserDoc(null)
+      setLoadingDoc(false)
+      return
+    }
+
+    (async () => {
+      try {
+        setLoadingDoc(true)
+        const ref = doc(db, "users", user.uid)
+        const snap = await getDoc(ref)
+        if (!cancelled) setUserDoc(snap.exists() ? snap.data() : null)
+      } finally {
+        if (!cancelled) setLoadingDoc(false)
+      }
+    })()
+
+    return () => { cancelled = true }
+  }, [user])
+
   useEffect(() => {
     if (initializing) return;
 
-    const target = user ? '/(navbar)/dashboard' : '/(auth)/login';
+    setShowSplash(true); // keep overlay up while routing
 
-    setShowSplash(true)
+    if (!user) {
+      router.replace("/(auth)/login")
+      const t = setTimeout(() => setShowSplash(false), 500)
+      return () => clearTimeout(t)
+    }
+
+    // Wait until Firestore profile has been fetched at least once
+    if (loadingDoc) return
+
+    const profile = userDoc
+    const required = ["name", "age", "height", "weight", "fitnessGoal", "fitnessLevel"]
+    const needs =
+      !profile ||
+      required.some((k) => profile[k] === undefined || profile[k] === null || profile[k] === "") ||
+      profile.onboardingComplete === false
+
+    const target = needs ? "/(onboarding)/intro" : "/(navbar)/dashboard"
     router.replace(target)
-    const timer = setTimeout(() => {
-      setShowSplash(false)
-    }, 500)
 
-    return () => clearTimeout(timer)
-
-  }, [initializing, user, router])
+    const t = setTimeout(() => setShowSplash(false), 1000) // keep overlay a beat past replace
+    return () => clearTimeout(t)
+  }, [initializing, user, userDoc, loadingDoc, router])
 
   if (initializing || showSplash) {
-    return <ThemedSplash style={StyleSheet.absoluteFillObject} onAnimationFinish={() => setShowSplash(false)} />
+    return <ThemedSplash style={StyleSheet.absoluteFillObject} />
   }
   return null
 }
@@ -48,6 +91,7 @@ const RootLayout = () => {
         }}>
             <Stack.Screen name="(navbar)" options={{ headerShown: false }} />
             <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+            <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
             <Stack.Screen name="index" options={{ title: 'Home', headerBackVisible: false, headerLeft: () => null, gestureEnabled: false }} />
         </Stack>
         <AuthGate />
