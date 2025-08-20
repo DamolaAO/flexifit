@@ -45,26 +45,26 @@ const OnboardingIntro = () => {
   }, [fade1, fade2, fade3, btnFade])
 
     const handleStart = () => {
-        router.replace('/(onboarding)/name')
+        router.replace('/(onboarding)/age')
     }
 
     return (
-        <ThemedView style={styles.container}>
-            <AnimatedThemedText title={ true } style={[{ opacity: fade1 }, styles.title]}>Welcome to FlexiFit</AnimatedThemedText>
-            <Spacer />
+      <ThemedView style={styles.container}>
+          <AnimatedThemedText title={ true } style={[{ opacity: fade1 }, styles.title]}>Welcome to FlexiFit</AnimatedThemedText>
+          <Spacer />
 
-            <AnimatedThemedText style={[{ textAlign: 'center', opacity: fade2 }, styles.subtitle]}> We'll collect some information to set up your profile.
-            </AnimatedThemedText>
-            <Spacer />
+          <AnimatedThemedText style={[{ textAlign: 'center', opacity: fade2 }, styles.subtitle]}> We'll collect some information to set up your profile.
+          </AnimatedThemedText>
+          <Spacer />
 
-            <AnimatedThemedText style={[{ textAlign: 'center', opacity: fade3 }, styles.subtitle]}> This will help us tailor your experience to achieve your fitness goals.
-            </AnimatedThemedText>
-            <Spacer height={30} />
+          <AnimatedThemedText style={[{ textAlign: 'center', opacity: fade3 }, styles.subtitle]}> This will help us tailor your experience to achieve your fitness goals.
+          </AnimatedThemedText>
+          <Spacer height={30} />
 
-            <AnimatedThemedButton onPress={handleStart} style={{ opacity: btnFade }}>
-                <ThemedText>Get Started</ThemedText>
-            </AnimatedThemedButton>
-        </ThemedView>
+          <AnimatedThemedButton onPress={handleStart} style={{ opacity: btnFade }}>
+              <ThemedText>Get Started</ThemedText>
+          </AnimatedThemedButton>
+      </ThemedView>
     )
 }
 
