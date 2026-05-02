@@ -9,6 +9,7 @@ import { useAuth } from '../hooks/useAuth'
 import ThemedSplash from '../components/ThemedSplash'
 import ThemedView from '../components/ThemedView'
 import { doc, getDoc } from 'firebase/firestore'
+import { db } from "../firebase/firebaseConfig";
 
 function AuthGate() {
   const { user, initializing } = useAuth()

@@ -45,7 +45,7 @@ const OnboardingIntro = () => {
   }, [fade1, fade2, fade3, btnFade])
 
     const handleStart = () => {
-        router.replace('/(onboarding)/age')
+        router.push('/(onboarding)/name')
     }
 
     return (

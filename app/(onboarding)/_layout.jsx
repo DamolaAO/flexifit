@@ -3,6 +3,7 @@ import { StyleSheet } from 'react-native'
 import { useEffect, useState } from 'react'
 import { Stack, useRouter } from 'expo-router'
 import { useAuth } from '../../hooks/useAuth'
+import OnboardingProvider from '../../context/OnboardingContext'
 
 
 const OnboardingLayout = () => {
