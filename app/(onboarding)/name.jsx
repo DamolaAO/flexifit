@@ -1,33 +1,31 @@
-import { StyleSheet } from 'react-native'
-import React, { useState } from 'react'
-import { useRouter } from 'expo-router'
+import { StyleSheet, Alert } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { useRouter, useGlobalSearchParams, useLocalSearchParams } from 'expo-router'
 
 import ThemedView from '../../components/ThemedView'
 import ThemedText from '../../components/ThemedText'
 import ThemedTextInput from '../../components/ThemedTextInput'
 import ThemedButton from '../../components/ThemedButton'
 import Spacer from '../../components/Spacer'
-
-import { doc, setDoc } from 'firebase/firestore'
-import { db } from '../../firebase/firebaseConfig'
-import { useAuth } from '../../hooks/useAuth'
+import { useOnboarding } from '../../context/OnboardingContext'
 
 const OnboardingName = () => {
   const router = useRouter()
-  const [name, setName] = useState('')
+  const { onboardingData, updateOnboardingData } = useOnboarding()
+  const { editMode } = useLocalSearchParams()
+  const isEditMode = editMode === "true"
+
+  const [name, setName] = useState(onboardingData.name)
 
   const isComplete = name.trim().length > 0
 
-  const handleNext = () => {
+  const onContinue = () => {
     if (!isComplete) {
-      alert('Please enter your name')
+      Alert.alert('Please enter your name')
       return
     }
-    
-    router.push({
-      pathname: '/(onboarding)/age',
-      params: { name: name.trim() },
-    })
+    updateOnboardingData({ name: name.trim() })
+    router.push(isEditMode ? '/(onboarding)/review' : '/(onboarding)/age')
   };
   
   return (
@@ -50,8 +48,8 @@ const OnboardingName = () => {
         />
 
       <Spacer size={30} />
-      <ThemedButton onPress={handleNext} disabled={!isComplete}>
-        <ThemedText>Continue</ThemedText>
+      <ThemedButton onPress={onContinue}>
+        <ThemedText>{isEditMode ? "Save Changes" : "Continue"}</ThemedText>
       </ThemedButton>
     </ThemedView>
   )

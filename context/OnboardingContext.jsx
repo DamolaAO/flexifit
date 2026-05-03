@@ -5,11 +5,15 @@ const OnboardingContext = createContext(null)
 export function OnboardingProvider({ children }) {
   const [onboardingData, setOnboardingData] = useState({
     name: '',
+    dob: '',
+    dobDay: null,
+    dobMonth: null,
+    dobYear: null,
     age: '',
     height: '',
     weight: '',
     fitnessLevel: '',
-    fitnessGoal: '',
+    fitnessGoal: [],
   })
 
   const updateOnboardingData = (newData) => {
@@ -22,11 +26,15 @@ export function OnboardingProvider({ children }) {
   const resetOnboardingData = () => {
     setOnboardingData({
       name: '',
+      dob: '',
+      dobDay: null,
+      dobMonth: null,
+      dobYear: null,
       age: '',
       height: '',
       weight: '',
       fitnessLevel: '',
-      fitnessGoal: '',
+      fitnessGoal: [],
     })
   }
 

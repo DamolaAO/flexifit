@@ -12,13 +12,16 @@ const OnboardingLayout = () => {
     const [checking, setChecking] = useState(true)
 
     return (
-        <Stack
-            screenOptions={{
-                headerShown: false,
-                animation: 'slide_from_right',
-                gestureEnabled: false,
-            }}
-        />
+        <OnboardingProvider>
+            <Stack
+                screenOptions={{
+                    headerShown: false,
+                    animation: 'slide_from_right',
+                    gestureEnabled: false,
+                }}
+            />
+        </OnboardingProvider>
+            
     )
 }
 

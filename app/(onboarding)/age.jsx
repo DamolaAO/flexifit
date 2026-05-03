@@ -1,20 +1,21 @@
 // app/(onboarding)/dob.jsx
 import React, { useEffect, useMemo, useState } from 'react';
-import { View, StyleSheet, Modal, FlatList, Pressable, TouchableOpacity } from 'react-native';
-import { useRouter, useNavigation } from 'expo-router';
+import { View, StyleSheet, Modal, FlatList, Pressable, TouchableOpacity, Alert } from 'react-native';
+import { useRouter, useNavigation, useLocalSearchParams } from 'expo-router';
 import ThemedView from '../../components/ThemedView';
 import ThemedText from '../../components/ThemedText';
 import ThemedButton from '../../components/ThemedButton';
 import Spacer from '../../components/Spacer';
+import { useOnboarding } from '../../context/OnboardingContext';
 
-// --- Reusable dropdown (no external libs) ---
+
 const DropdownSelect = ({
   label,
   value,
   onChange,
-  options,          // [{label, value}]
+  options,          
   placeholder = 'Select…',
-  width,            // optional fixed width
+  width,            
   testID
 }) => {
   const [open, setOpen] = useState(false);
@@ -59,6 +60,11 @@ const DropdownSelect = ({
 const OnboardingAge = () => {
   const router = useRouter();
   const navigation = useNavigation();
+  const { editMode } = useLocalSearchParams();
+  const isEditMode = editMode === 'true';
+
+  const { onboardingData, updateOnboardingData } = useOnboarding()
+  console.log('Onboarding Data:', onboardingData); // FOR DEBUGGING PURPOSES **** REMOVE 
 
   useEffect(() => {
     navigation.setOptions({ headerShown: false });
@@ -80,8 +86,8 @@ const OnboardingAge = () => {
     });
   }, []);
 
-  const [year, setYear] = useState(null);
-  const [month, setMonth] = useState(null);
+  const [year, setYear] = useState(onboardingData.dobYear);
+  const [month, setMonth] = useState(onboardingData.dobMonth);
   const daysInMonth = useMemo(() => {
     if (!year || !month) return 31;
     // day 0 of next month = last day of current month
@@ -93,7 +99,7 @@ const OnboardingAge = () => {
     [daysInMonth]
   );
 
-  const [day, setDay] = useState(null);
+  const [day, setDay] = useState(onboardingData.dobDay);
 
   // If month/year change and the selected day is now invalid and clamp it.
   useEffect(() => {
@@ -103,12 +109,37 @@ const OnboardingAge = () => {
   const isComplete = !!day && !!month && !!year;
 
   const onContinue = () => {
-    if (!isComplete) return;
-    const dob = new Date(year, month - 1, day);
-    // Save to users firebase collection in next change
-    // onboarding.setDOB(dob.toISOString())
-    router.push('/(onboarding)/body');
-  };
+    if (!isComplete) {
+      Alert.alert(
+        'Missing details',
+        'Please enter your date of birth.'
+      )
+      return
+    }
+
+  const dob = new Date(year, month - 1, day);
+
+  const today = new Date();
+  let calculatedAge = today.getFullYear() - year;
+
+  const hasBirthdayPassed =
+    today.getMonth() + 1 > month ||
+    (today.getMonth() + 1 === month && today.getDate() >= day);
+
+  if (!hasBirthdayPassed) {
+    calculatedAge--;
+  }
+
+  updateOnboardingData({
+    dob: dob.toISOString(),
+    dobDay: day,
+    dobMonth: month,
+    dobYear: year,
+    age: calculatedAge,
+  });
+
+  router.push(isEditMode ? '/(onboarding)/review' : '/(onboarding)/body');
+};
 
   return (
     <ThemedView style={styles.container}>
@@ -146,8 +177,8 @@ const OnboardingAge = () => {
       </View>
 
       <Spacer size={30} />
-      <ThemedButton onPress={onContinue} disabled={!isComplete}>
-        <ThemedText>Continue</ThemedText>
+      <ThemedButton onPress={onContinue}>
+        <ThemedText>{isEditMode ? "Save Changes" : "Continue"}</ThemedText>
       </ThemedButton>
     </ThemedView>
   );
@@ -191,12 +222,12 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   popup: {
-  maxHeight: 400,           // smaller height
-  width: 160,               // skinnier
+  maxHeight: 400,
+  width: 160,
   borderRadius: 12,
   paddingVertical: 8,
   backgroundColor: 'white',
-  alignSelf: 'center',      // centered horizontally
+  alignSelf: 'center',
 },
   sheetTitle: { textAlign: 'center', marginBottom: 8 },
 

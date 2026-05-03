@@ -60,7 +60,7 @@ function AuthGate() {
     const needs =
       !profile ||
       required.some((k) => profile[k] === undefined || profile[k] === null || profile[k] === "") ||
-      profile.onboardingComplete === false
+      profile.onboardingComplete !== true
 
     const target = needs ? "/(onboarding)/intro" : "/(navbar)/dashboard"
     router.replace(target)
