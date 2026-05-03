@@ -1,35 +1,65 @@
 import { StyleSheet, ScrollView, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { doc, getDoc } from 'firebase/firestore'
+import React, { useEffect, useState, useCallback } from 'react'
+import { useRouter, useFocusEffect } from 'expo-router'
+
+import { doc, getDoc, collection, getDocs, query, orderBy, limit } from 'firebase/firestore'
+import { db } from '../../firebase/firebaseConfig'
+import { useAuth } from '../../hooks/useAuth'
 
 import ThemedView from '../../components/ThemedView'
 import ThemedCard from '../../components/ThemedCard'
 import ThemedText from '../../components/ThemedText'
+import ThemedButton from '../../components/ThemedButton'
 import Spacer from '../../components/Spacer'
 
-import { db } from '../../firebase/firebaseConfig'
-import { useAuth } from '../../hooks/useAuth'
 
 const Dashboard = () => {
+  const router = useRouter()
   const { user } = useAuth()
   const [profile, setProfile] = useState(null)
+  const [weightLogs, setWeightLogs] = useState([])
 
-  useEffect(() => {
-    const loadProfile = async () => {
-      if (!user) return
+  useFocusEffect(
+    useCallback(() => {
+      const loadProfile = async () => {
+        if (!user) return
 
-      const ref = doc(db, 'users', user.uid)
-      const snap = await getDoc(ref)
+        const ref = doc(db, 'users', user.uid)
+        const snap = await getDoc(ref)
 
-      if (snap.exists()) {
-        setProfile(snap.data())
+        if (snap.exists()) {
+          setProfile(snap.data())
+        }
+
+        const weightQuery = query(
+          collection(db, 'users', user.uid, 'weightLogs'),
+          orderBy('createdAt', 'desc'),
+          limit(5)
+        )
+
+        const weightSnapshot = await getDocs(weightQuery)
+
+        const logs = weightSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }))
+
+        setWeightLogs(logs)
       }
-    }
 
-    loadProfile()
-  }, [user])
+      loadProfile()
+    }, [user])
+  )
 
-  const name = profile?.name || 'there'
+  const name = profile?.name || 'User'
+
+  const currentWeight = profile?.weight
+  const startingWeight = profile?.startingWeight
+
+  const weightChange =
+    currentWeight && startingWeight
+      ? currentWeight - startingWeight
+      : null
 
   return (
     <ThemedView style={styles.container} safe={true}>
@@ -86,9 +116,45 @@ const Dashboard = () => {
 
         <ThemedCard style={styles.fullCard}>
           <ThemedText style={styles.cardTitle}>Weight Progress</ThemedText>
+
           <ThemedText>
             Current weight: {profile?.weight ? `${profile.weight} kg` : 'Not available'}
           </ThemedText>
+
+          {weightChange !== null && weightLogs.length > 1 && (
+            <ThemedText>
+              Your weight has changed by {weightChange > 0 ? '+' : ''}{weightChange} kg!
+            </ThemedText>
+          )}
+
+          <Spacer size={10} />
+
+          {weightLogs.length > 0 ? (
+            weightLogs.map((log) => (
+              <ThemedText key={log.id}>
+                {log.date}: {log.weight} kg
+              </ThemedText>
+            ))
+          ) : (
+            <ThemedText>No weight logs yet.</ThemedText>
+          )}
+
+          <ThemedButton
+            onPress={() => router.push('/(dashboard)/weightLog')}
+            style={styles.weightButton}
+          >
+            <ThemedText style={styles.weightButtonText}>+ Log new weight</ThemedText>
+          </ThemedButton>
+
+          <ThemedButton
+            onPress={() => router.push('/(dashboard)/manageWeightLogs')}
+            style={styles.weightButton}
+          >
+            <ThemedText style={styles.weightButtonText}>
+              Manage weight logs
+            </ThemedText>
+          </ThemedButton>
+
         </ThemedCard>
       </ScrollView>
     </ThemedView>
@@ -138,17 +204,34 @@ const styles = StyleSheet.create({
     padding: 12,
     justifyContent: 'center',
   },
-fullCard: {
-  width: '100%',
-  marginBottom: 12,
-},
-cardValue: {
-  fontSize: 28,
-  fontWeight: 'bold',
-  marginVertical: 6,
-},
-cardSubtext: {
-  fontSize: 13,
-  opacity: 0.7,
-},
+  fullCard: {
+    width: '100%',
+    marginBottom: 12,
+  },
+  cardValue: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginVertical: 6,
+  },
+  cardSubtext: {
+    fontSize: 13,
+    opacity: 0.7,
+  },
+  weightButton: {
+    alignSelf: 'flex-start',
+    marginTop: 16,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderRadius: 14,
+
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.18)',
+
+    backgroundColor: 'rgba(255,255,255,0.08)',
+  },
+
+  weightButtonText: {
+    fontSize: 15,
+    fontWeight: '700',
+  },
 })

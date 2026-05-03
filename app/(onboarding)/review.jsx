@@ -47,6 +47,8 @@ const Review = () => {
         doc(db, 'users', user.uid),
         {
           ...onboardingData,
+          startingWeight: Number(onboardingData.weight),
+          weight: Number(onboardingData.weight),
           onboardingComplete: true,
           updatedAt: serverTimestamp(),
         },
