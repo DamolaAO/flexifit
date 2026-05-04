@@ -72,7 +72,7 @@ const Dashboard = () => {
           Here’s your health and fitness snapshot for today.
         </ThemedText>
 
-        <Spacer size={20} />
+        <Spacer height={20} />
 
         <View style={styles.grid}>
           <ThemedCard style={styles.smallCard}>
@@ -100,7 +100,7 @@ const Dashboard = () => {
           </ThemedCard>
         </View>
 
-        <Spacer size={16} />
+        <Spacer height={16} />
 
         <ThemedCard style={styles.fullCard}>
           <ThemedText style={styles.cardTitle}>Today’s Workout</ThemedText>
@@ -127,7 +127,7 @@ const Dashboard = () => {
             </ThemedText>
           )}
 
-          <Spacer size={10} />
+          <Spacer height={20} />
 
           {weightLogs.length > 0 ? (
             weightLogs.map((log) => (

@@ -49,7 +49,7 @@ const DropdownSelect = ({
               initialNumToRender={30}
               getItemLayout={(_, index) => ({ length: 48, offset: 48 * index, index })}
             />
-            <Spacer size={8} />
+            <Spacer height={8} />
           </Pressable>
         </Pressable>
       </Modal>
@@ -147,7 +147,7 @@ const OnboardingAge = () => {
         Enter your date of birth
       </ThemedText>
 
-      <Spacer size={24} />
+      <Spacer height={24} />
 
       <View style={styles.row}>
         <DropdownSelect
@@ -176,7 +176,7 @@ const OnboardingAge = () => {
         />
       </View>
 
-      <Spacer size={30} />
+      <Spacer height={30} />
       <ThemedButton onPress={onContinue}>
         <ThemedText>{isEditMode ? "Save Changes" : "Continue"}</ThemedText>
       </ThemedButton>

@@ -72,7 +72,7 @@ const Review = () => {
           Review your details
         </ThemedText>
 
-        <Spacer size={24} />
+        <Spacer height={24} />
 
         <ReviewRow
           label="Name"
@@ -115,7 +115,7 @@ const Review = () => {
           edit={() => goToEditPage('goal')}
         />
 
-        <Spacer size={30} />
+        <Spacer height={30} />
 
         <ThemedButton onPress={saveProfile}>
           <ThemedText>{saving ? 'Saving...' : 'Confirm and continue'}</ThemedText>

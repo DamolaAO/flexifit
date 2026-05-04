@@ -75,13 +75,13 @@ const OnboardingBodyInfo = () => {
           Tell us about yourself
         </ThemedText>
 
-        <Spacer size={10} />
+        <Spacer height={10} />
 
         <ThemedText style={styles.subtitle}>
           Enter your height in cm and your weight in kg.
         </ThemedText>
 
-        <Spacer size={30} />
+        <Spacer height={30} />
 
         <ThemedText style={styles.label}>Height</ThemedText>
         <ThemedTextInput
@@ -96,7 +96,7 @@ const OnboardingBodyInfo = () => {
           }}
         />
 
-        <Spacer size={20} />
+        <Spacer height={20} />
 
         <ThemedText style={styles.label}>Weight</ThemedText>
         <ThemedTextInput
@@ -111,7 +111,7 @@ const OnboardingBodyInfo = () => {
           }}
         />
 
-        <Spacer size={35} />
+        <Spacer height={35} />
 
         <ThemedButton onPress={onContinue}>
           <ThemedText>{isEditMode ? "Save Changes" : "Continue"}</ThemedText>

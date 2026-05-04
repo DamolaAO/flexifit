@@ -60,13 +60,13 @@ const OnboardingFitnessGoal = () => {
         What are your goals?
       </ThemedText>
 
-      <Spacer size={15} />
+      <Spacer height={15} />
 
       <ThemedText style={styles.subtitle}>
         Select one or more goals.
       </ThemedText>
 
-      <Spacer size={30} />
+      <Spacer height={30} />
 
       {goalOptions.map((goal) => {
         const selected = fitnessGoal.includes(goal)
@@ -85,7 +85,7 @@ const OnboardingFitnessGoal = () => {
         )
       })}
 
-      <Spacer size={30} />
+      <Spacer height={30} />
 
       <ThemedButton onPress={onContinue} disabled={!isComplete}>
         <ThemedText>{isEditMode ? "Save Changes" : "Continue"}</ThemedText>

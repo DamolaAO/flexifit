@@ -10,6 +10,8 @@ export const Colours = {
     iconColor: "#9591a5",
     iconColorFocused: "#fff",
     uiBackground: "#1f2937",
+    buttonBackground: "rgba(255,255,255,0.08)",
+    buttonBorder: "rgba(255,255,255,0.18)",
   },
 
   light: {
@@ -20,5 +22,7 @@ export const Colours = {
     iconColor: "#686477",
     iconColorFocused: "#201e2b",
     uiBackground: "#d6d5e1",
+    buttonBackground: "rgba(32,30,43,0.06)",
+    buttonBorder: "rgba(32,30,43,0.18)",
   },
 }

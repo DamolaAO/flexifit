@@ -13,13 +13,18 @@ const Home = () => {
   return (
     <ThemedView style={styles.container}>
       <ThemedLogo style={styles.logo} />
+
       <Spacer height={20} />
+
       <ThemedText style={styles.title}>FlexiFit</ThemedText>
+
       <Spacer height={10} />
+
       <ThemedText style={styles.subtitle}>Welcome to FlexiFit</ThemedText>
       <Spacer/>
 
       <ThemedText>Start your fitness journey today!</ThemedText>
+      
       <Spacer height={20} />
       
       <ThemedCard>

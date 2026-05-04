@@ -24,7 +24,7 @@ const NavbarLayout = () => {
             paddingTop: 10,
             paddingBottom: 30,
             paddingHorizontal: 20,
-            height: 80,
+            size: 80,
         },
         tabBarActiveTintColor: theme.iconColorFocused,
         tabBarInactiveTintColor: theme.iconColor,

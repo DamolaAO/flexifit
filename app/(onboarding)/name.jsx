@@ -34,7 +34,7 @@ const OnboardingName = () => {
         How would you like to be refered to?
       </ThemedText>
 
-      <Spacer size={24} />
+      <Spacer height={24} />
 
       <ThemedTextInput
           style={{ width: '80%', marginBottom: 20 }}
@@ -47,7 +47,7 @@ const OnboardingName = () => {
           }}
         />
 
-      <Spacer size={30} />
+      <Spacer height={30} />
       <ThemedButton onPress={onContinue}>
         <ThemedText>{isEditMode ? "Save Changes" : "Continue"}</ThemedText>
       </ThemedButton>
