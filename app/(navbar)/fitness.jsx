@@ -1,4 +1,4 @@
-import { StyleSheet, ScrollView, View } from 'react-native'
+import { StyleSheet, ScrollView, View, Pressable } from 'react-native'
 import React, { useCallback, useState, useRef } from 'react'
 import { useRouter, useFocusEffect } from 'expo-router'
 import { collection, getDocs, orderBy, query, limit } from 'firebase/firestore'
@@ -82,23 +82,39 @@ const Fitness = () => {
             <ThemedText>Loading workouts...</ThemedText>
           ) : workouts.length > 0 ? (
             workouts.map((workout) => (
-              <View key={workout.id} style={styles.workoutItem}>
-                <ThemedText style={styles.workoutTitle}>
-                  {workout.title || `${workout.exercises?.length || 0} exercise session`}
-                </ThemedText>
-
-                <ThemedText style={styles.workoutDate}>
-                  {workout.date || 'No date saved'}
-                </ThemedText>
-
-                <Spacer height={6} />
-
-                {workout.exercises?.slice(0, 3).map((exercise, index) => (
-                  <ThemedText key={index} style={styles.exerciseText}>
-                    • {exercise.name}
+              <Pressable
+                key={workout.id}
+                style={({ pressed }) => [
+                  styles.workoutItem,
+                  pressed && styles.workoutPressed,
+                ]}
+                onPress={() =>
+                  router.push({
+                    pathname: '/(fitness)/workoutDetails',
+                    params: {
+                      workoutId: workout.id,
+                    },
+                  })
+                }
+              >
+                <View style={styles.workoutItem}>
+                  <ThemedText style={styles.workoutTitle}>
+                    {workout.title || `${workout.exercises?.length || 0} exercise session`}
                   </ThemedText>
-                ))}
-              </View>
+
+                  <ThemedText style={styles.workoutDate}>
+                    {workout.date || 'No date saved'}
+                  </ThemedText>
+
+                  <Spacer height={6} />
+
+                  {workout.exercises?.slice(0, 3).map((exercise, index) => (
+                    <ThemedText key={index} style={styles.exerciseText}>
+                      • {exercise.name}
+                    </ThemedText>
+                  ))}
+                </View>
+              </Pressable>
             ))
           ) : (
             <ThemedText>No workouts logged yet.</ThemedText>
@@ -214,5 +230,8 @@ const styles = StyleSheet.create({
   scrollTopButton: {
     top: 70,
     right: 20,
+  },
+  workoutPressed: {
+    opacity: 0.4,
   },
 })

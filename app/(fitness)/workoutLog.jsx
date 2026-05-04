@@ -30,7 +30,7 @@ const WorkoutLog = () => {
             headerBackTitleStyle: { fontSize: 14 },
             headerTitleStyle: { fontSize: 20 },
         })
-        }, [navigation])
+    }, [navigation])
 
     const filteredExercises = useMemo(() => {
         if (search.trim().length < 2) return []

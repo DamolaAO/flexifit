@@ -32,7 +32,7 @@ const NavbarLayout = () => {
     >
       <Tabs.Screen 
       name="meals" 
-      options={{ 
+      options={{
         title: 'Meals', 
         tabBarIcon: ({ focused }) => (
           <MaterialCommunityIcons name="food-turkey" 
