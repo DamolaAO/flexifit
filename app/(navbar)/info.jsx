@@ -26,7 +26,7 @@ const info = () => {
   return (
     <ThemedView style={styles.container} safe={true}>
         
-      <ThemedText title={true} style={styles.title}>info</ThemedText>
+      <ThemedText title={true} style={styles.title}>Info</ThemedText>
       <Spacer />
 
       <ThemedButton onPress={handleLogout}>

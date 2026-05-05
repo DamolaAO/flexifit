@@ -13,12 +13,12 @@ import Spacer from '../../components/Spacer'
 import ThemedButton from '../../components/ThemedButton'
 
 const WorkoutDetails = () => {
-  const navigation = useNavigation()
-  const { workoutId } = useLocalSearchParams()
-  const { user } = useAuth()
-  const router = useRouter()
+    const navigation = useNavigation()
+    const { workoutId } = useLocalSearchParams()
+    const { user } = useAuth()
+    const router = useRouter()
 
-  const [workout, setWorkout] = useState(null)
+    const [workout, setWorkout] = useState(null)
 
     useEffect(() => {
         navigation.setOptions({
@@ -126,6 +126,14 @@ const WorkoutDetails = () => {
         )
     }
 
+    const totalDistance = workout?.exercises?.reduce((total, exercise) => {
+        if (exercise.category !== 'cardio') return total
+
+        return total + exercise.sets?.reduce((setTotal, set) => {
+            return setTotal + (Number(set.distance) || 0)
+        }, 0)
+    }, 0)
+
     if (!workout) {
         return (
         <ThemedView style={styles.container} safe={true}>
@@ -141,7 +149,7 @@ const WorkoutDetails = () => {
                 <ThemedText title={true}style={styles.title}onPress={editWorkoutTitle}>
                     {workout.title || 'Workout'}
                 </ThemedText>
- 
+
                 <ThemedText style={styles.date}>
                 {workout.date || 'No date saved'}
                 </ThemedText>
@@ -150,10 +158,11 @@ const WorkoutDetails = () => {
 
                 <ThemedCard style={styles.statsCard}>
                     <ThemedText style={styles.statsTitle}>Workout Summary</ThemedText>
-                    <ThemedText>Exercises: {totalExercises}</ThemedText>
-                    <ThemedText>Sets: {totalSets}</ThemedText>
-                    <ThemedText>Reps: {totalReps}</ThemedText>
-                    <ThemedText>Volume: {totalVolume} kg</ThemedText>
+                    <ThemedText style={styles.summaryContent}>Exercises: {totalExercises}</ThemedText>
+                    <ThemedText style={styles.summaryContent}>Sets: {totalSets}</ThemedText>
+                    <ThemedText style={styles.summaryContent}>Reps: {totalReps}</ThemedText>
+                    <ThemedText style={styles.summaryContent}>Volume: {totalVolume} kg</ThemedText>
+                    <ThemedText style={styles.summaryContent}>Cardio Distance: {totalDistance} km</ThemedText>
                 </ThemedCard>
 
                 <Spacer height={20} />
@@ -167,9 +176,19 @@ const WorkoutDetails = () => {
                     <Spacer height={12} />
 
                     <View style={styles.setHeader}>
-                    <ThemedText style={styles.setColumn}>Set</ThemedText>
-                    <ThemedText style={styles.setColumn}>Weight</ThemedText>
-                    <ThemedText style={styles.setColumn}>Reps</ThemedText>
+                        <ThemedText style={styles.setColumn}>Set</ThemedText>
+
+                        {exercise.category === 'cardio' ? (
+                            <>
+                            <ThemedText style={styles.setColumn}>Distance</ThemedText>
+                            <ThemedText style={styles.setColumn}>Time</ThemedText>
+                            </>
+                        ) : (
+                            <>
+                            <ThemedText style={styles.setColumn}>Weight</ThemedText>
+                            <ThemedText style={styles.setColumn}>Reps</ThemedText>
+                            </>
+                        )}
                     </View>
 
                     {exercise.sets?.map((set, setIndex) => (
@@ -178,13 +197,27 @@ const WorkoutDetails = () => {
                         {set.setNumber}
                         </ThemedText>
 
-                        <ThemedText style={styles.setColumn}>
-                        {set.weight} kg
-                        </ThemedText>
+                        {exercise.category === 'cardio' ? (
+                            <>
+                            <ThemedText style={styles.setColumn}>
+                            {set.distance || 0} km
+                            </ThemedText>
 
-                        <ThemedText style={styles.setColumn}>
-                        {set.reps}
-                        </ThemedText>
+                            <ThemedText style={styles.setColumn}>
+                            {set.time || '00:00'}
+                            </ThemedText>
+                            </>
+                        ) : (
+                            <>
+                            <ThemedText style={styles.setColumn}>
+                            {set.weight} kg
+                            </ThemedText>
+
+                            <ThemedText style={styles.setColumn}>
+                            {set.reps}
+                            </ThemedText>
+                            </>
+                        )}
                     </View>
                     ))}
                 </ThemedCard>
@@ -204,63 +237,68 @@ const WorkoutDetails = () => {
 export default WorkoutDetails
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  content: {
-    padding: 20,
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  date: {
-    fontSize: 15,
-    fontWeight: '700',
-    opacity: 0.75,
-    marginTop: 6,
-  },
-  exerciseCard: {
-    width: '100%',
-    marginBottom: 14,
-  },
-  exerciseTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-  },
-  setHeader: {
-    width: '100%',
-    flexDirection: 'row',
-    marginBottom: 8,
-  },
-  setRow: {
-    width: '100%',
-    flexDirection: 'row',
-    marginBottom: 8,
-  },
-  setColumn: {
-    flex: 1,
-    textAlign: 'center',
-    fontWeight: '600',
-  },
-  deleteButton: {
-    width: '100%',
-    alignSelf: 'center',
-  },
-  deleteButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    textAlign: 'center',
-  },
-  statsCard: {
-    width: '100%',
-    marginBottom: 14,
-  },
-  statsTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    marginBottom: 8,
-  },
+    container: {
+        flex: 1,
+    },
+    content: {
+        padding: 20,
+        alignItems: 'center',
+    },
+    title: {
+        fontSize: 30,
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    date: {
+        fontSize: 15,
+        fontWeight: '700',
+        opacity: 0.75,
+        marginTop: 6,
+    },
+    exerciseCard: {
+        width: '100%',
+        marginBottom: 14,
+    },
+    exerciseTitle: {
+        fontSize: 18,
+        fontWeight: '700',
+        textAlign: 'center',
+    },
+    setHeader: {
+        width: '100%',
+        flexDirection: 'row',
+        marginBottom: 8,
+    },
+    setRow: {
+        width: '100%',
+        flexDirection: 'row',
+        marginBottom: 8,
+    },
+    setColumn: {
+        flex: 1,
+        textAlign: 'center',
+        fontWeight: '600',
+    },
+    deleteButton: {
+        width: '100%',
+        alignSelf: 'center',
+    },
+    deleteButtonText: {
+        fontSize: 16,
+        fontWeight: '700',
+        textAlign: 'center',
+    },
+    statsCard: {
+        width: '100%',
+        marginBottom: 14,
+    },
+    statsTitle: {
+        fontSize: 18,
+        fontWeight: '700',
+        marginBottom: 8,
+        textAlign: 'center',
+    },
+    summaryContent: {
+        textAlign: 'center',
+    }
 })

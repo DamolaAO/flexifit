@@ -14,7 +14,6 @@ const NavbarLayout = () => {
   const theme = Colours[colourScheme] ?? Colours.light // Fallback to light theme if scheme is not recognized
 
   return (
-
     <Tabs
       screenOptions={{
         headerShown: false,
