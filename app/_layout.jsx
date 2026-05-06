@@ -110,13 +110,25 @@ const RootLayout = () => {
                   headerBackVisible: false,
                   headerTitle: titles[routeName] ?? 'Dashboard',
                   headerLeft: () => (
-                    <ThemedLogo
+                    <ThemedView
                       style={{
                         width: 90,
                         height: 35,
-                        resizeMode: 'contain',
+                        borderRadius: 20,
+                        overflow: 'hidden',
+                        backgroundColor: colourScheme === 'dark' ? '#111827' : '#e0dfe8',
+                        justifyContent: 'center',
+                        alignItems: 'center',
                       }}
-                    />
+                    >
+                      <ThemedLogo
+                        style={{
+                          width: 90,
+                          height: 35,
+                          resizeMode: 'contain',
+                        }}
+                      />
+                    </ThemedView>
                   ),
                 }
               }}

@@ -1,6 +1,8 @@
-import { StyleSheet, ScrollView, View } from 'react-native'
+import { StyleSheet, ScrollView, View, Dimensions } from 'react-native'
 import React, { useEffect, useState, useCallback } from 'react'
 import { useRouter, useFocusEffect } from 'expo-router'
+import Svg, { Line, Circle, Text as SvgText } from 'react-native-svg'
+import { Pedometer } from 'expo-sensors'
 
 import { doc, getDoc, collection, getDocs, query, orderBy, limit } from 'firebase/firestore'
 import { db } from '../../firebase/firebaseConfig'
@@ -16,10 +18,13 @@ import Spacer from '../../components/Spacer'
 const Dashboard = () => {
   const router = useRouter()
   const { user } = useAuth()
+
   const [profile, setProfile] = useState(null)
   const [weightLogs, setWeightLogs] = useState([])
   const [mealLogs, setMealLogs] = useState([])
   const [workoutLogs, setWorkoutLogs] = useState([])
+  const [steps, setSteps] = useState(0)
+  const [stepsAvailable, setStepsAvailable] = useState(false)
 
   useFocusEffect(
     useCallback(() => {
@@ -65,6 +70,19 @@ const Dashboard = () => {
         }))
 
         setWorkoutLogs(workouts)
+
+        const isAvailable = await Pedometer.isAvailableAsync()
+        setStepsAvailable(isAvailable)
+
+        if (isAvailable) {
+          const start = new Date()
+          start.setHours(0, 0, 0, 0)
+
+          const end = new Date()
+
+          const result = await Pedometer.getStepCountAsync(start, end)
+          setSteps(result.steps || 0)
+        }
       }
 
       loadProfile()
@@ -103,8 +121,16 @@ const Dashboard = () => {
   const age = Number(profile?.age || 0)
   const goal = String(profile?.fitnessGoal || '').toLowerCase()
 
+  const fitnessLevel = String(profile?.fitnessLevel || '').toLowerCase()
+
+  const activityMultiplier =
+    fitnessLevel.includes('beginner') ? 1.2 :
+    fitnessLevel.includes('intermediate') ? 1.5 :
+    fitnessLevel.includes('advanced') ? 1.7 :
+    1.2
+
   const maintenanceCalories = weight && height && age
-    ? Math.round(((10 * weight) + (6.25 * height) - (5 * age) + 5) * 1.4)
+    ? Math.round(((10 * weight) + (6.25 * height) - (5 * age) + 5) * activityMultiplier)
     : 0
 
   const calorieTarget = goal.includes('lose')
@@ -117,6 +143,38 @@ const Dashboard = () => {
 
   const todaysWorkout = todayWorkouts[0]
 
+  const screenWidth = Dimensions.get('window').width
+  const chartWidth = screenWidth - 80
+  const chartHeight = 180
+  const chartPadding = 24
+
+  const sortedWeightLogs = [...weightLogs].reverse()
+  const weightValues = sortedWeightLogs.map((log) => Number(log.weight || 0))
+
+  const minWeight = Math.min(...weightValues)
+  const maxWeight = Math.max(...weightValues)
+  const weightRange = maxWeight - minWeight || 1
+
+  const getX = (index) => {
+    if (sortedWeightLogs.length === 1) return chartWidth / 2
+    return (chartPadding * 2.5) + (index * (chartWidth - chartPadding * 4)) / (sortedWeightLogs.length - 1)
+  }
+  const getY = (weight) => {
+    return chartPadding + ((maxWeight - weight) / weightRange) * (chartHeight - chartPadding * 2)
+  }
+  const chartPoints = sortedWeightLogs.map((log, index) => ({
+    x: getX(index),
+    y: getY(Number(log.weight || 0)),
+    weight: Number(log.weight || 0),
+    date: log.date,
+  }))
+
+  const yAxisLabels = [
+    maxWeight,
+    (maxWeight + minWeight) / 2,
+    minWeight,
+  ]
+
   return (
     <ThemedView style={styles.container} safe={true}>
       <ScrollView contentContainerStyle={styles.content}>
@@ -127,6 +185,102 @@ const Dashboard = () => {
         <ThemedText style={styles.subtitle}>
           Here’s your health and fitness snapshot for today.
         </ThemedText>
+
+        <ThemedCard style={styles.fullCard}>
+        <ThemedText style={styles.cardTitle}>Weight Progress</ThemedText>
+
+        <ThemedText>
+          Current weight: {profile?.weight ? `${profile.weight} kg` : 'Not available'}
+        </ThemedText>
+
+        {weightChange !== null && weightLogs.length > 1 && (
+          <ThemedText>
+            Your weight has changed by {weightChange > 0 ? '+' : ''}{weightChange} kg!
+          </ThemedText>
+        )}
+
+        <Spacer height={20} />
+
+        {weightLogs.length > 1 ? (
+          <Svg width={chartWidth} height={chartHeight} style={styles.weightChart}>
+            {yAxisLabels.map((label, index) => {
+              const y = chartPadding + (index * (chartHeight - chartPadding * 2)) / 2
+
+              return (
+                <SvgText
+                  key={`y-label-${index}`}
+                  x={0}
+                  y={y + 4}
+                  fontSize="10"
+                  fill="blue"
+                >
+                  {label.toFixed(1)}kg
+                </SvgText>
+              )
+            })}
+
+            {chartPoints.map((point, index) => {
+              const barWidth = 18
+              const barHeight = chartHeight - chartPadding - point.y
+
+              return (
+                <React.Fragment key={`bar-${index}`}>
+                  <Line
+                    x1={point.x}
+                    y1={chartHeight - chartPadding}
+                    x2={point.x}
+                    y2={point.y}
+                    stroke="orange"
+                    strokeWidth={barWidth}
+                    strokeLinecap="round"
+                  />
+
+                  <Circle cx={point.x} cy={point.y} r="4" fill="orange" />
+
+                  <SvgText
+                    x={point.x}
+                    y={point.y - 12}
+                    fontSize="10"
+                    fill="green"
+                    textAnchor="middle"
+                  >
+                    {point.weight}kg
+                  </SvgText>
+
+                  <SvgText
+                    x={point.x}
+                    y={chartHeight - 4}
+                    fontSize="10"
+                    fill="red"
+                    textAnchor="middle"
+                  >
+                    {point.date?.slice(5)}
+                  </SvgText>
+                </React.Fragment>
+              )
+            })}
+          </Svg>
+        ) : (
+          <ThemedText>Log at least two weights to show a graph.</ThemedText>
+        )}
+
+        <ThemedButton
+          onPress={() => router.push('/(dashboard)/weightLog')}
+          style={styles.weightButton}
+        >
+          <ThemedText style={styles.weightButtonText}>+ Log new weight</ThemedText>
+        </ThemedButton>
+
+        <ThemedButton
+          onPress={() => router.push('/(dashboard)/manageWeightLogs')}
+          style={styles.weightButton}
+        >
+          <ThemedText style={styles.weightButtonText}>
+            Manage weight logs
+          </ThemedText>
+        </ThemedButton>
+
+      </ThemedCard>
 
         <Spacer height={20} />
 
@@ -151,8 +305,13 @@ const Dashboard = () => {
 
           <ThemedCard style={styles.smallCard}>
             <ThemedText style={[styles.cardTitle, { color: 'red'}]}>Steps</ThemedText>
-            <ThemedText style={[styles.cardValue, { color: 'red'}]}>—</ThemedText>
-            <ThemedText style={styles.cardSubtext}>Not logged yet</ThemedText>
+            <ThemedText style={styles.cardValue}>
+            {stepsAvailable ? steps : '—'}
+            </ThemedText>
+
+            <ThemedText style={styles.cardSubtext}>
+              {stepsAvailable ? 'steps today' : 'steps unavailable'}
+            </ThemedText>
           </ThemedCard>
         </View>
 
@@ -170,48 +329,7 @@ const Dashboard = () => {
         )}
       </ThemedCard>
 
-        <ThemedCard style={styles.fullCard}>
-          <ThemedText style={styles.cardTitle}>Weight Progress</ThemedText>
-
-          <ThemedText>
-            Current weight: {profile?.weight ? `${profile.weight} kg` : 'Not available'}
-          </ThemedText>
-
-          {weightChange !== null && weightLogs.length > 1 && (
-            <ThemedText>
-              Your weight has changed by {weightChange > 0 ? '+' : ''}{weightChange} kg!
-            </ThemedText>
-          )}
-
-          <Spacer height={20} />
-
-          {weightLogs.length > 0 ? (
-            weightLogs.map((log) => (
-              <ThemedText key={log.id}>
-                {log.date}: {log.weight} kg
-              </ThemedText>
-            ))
-          ) : (
-            <ThemedText>No weight logs yet.</ThemedText>
-          )}
-
-          <ThemedButton
-            onPress={() => router.push('/(dashboard)/weightLog')}
-            style={styles.weightButton}
-          >
-            <ThemedText style={styles.weightButtonText}>+ Log new weight</ThemedText>
-          </ThemedButton>
-
-          <ThemedButton
-            onPress={() => router.push('/(dashboard)/manageWeightLogs')}
-            style={styles.weightButton}
-          >
-            <ThemedText style={styles.weightButtonText}>
-              Manage weight logs
-            </ThemedText>
-          </ThemedButton>
-
-        </ThemedCard>
+      
       </ScrollView>
     </ThemedView>
   )
@@ -294,5 +412,10 @@ const styles = StyleSheet.create({
   workoutLogged: {
     color: 'green',
     fontWeight: '700',
+  },
+
+  weightChart: {
+    marginTop: 12,
+    alignSelf: 'center',
   },
 })

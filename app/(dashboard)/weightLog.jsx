@@ -93,7 +93,7 @@ const WeightLog = () => {
 
         <Spacer size={30} />
 
-        <ThemedButton onPress={saveWeight}>
+        <ThemedButton style={{alignSelf: 'center'}} onPress={saveWeight}>
           <ThemedText>{saving ? 'Saving...' : 'Save weight'}</ThemedText>
         </ThemedButton>
       </ThemedView>

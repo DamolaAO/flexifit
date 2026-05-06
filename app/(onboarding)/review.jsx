@@ -32,9 +32,6 @@ const Review = () => {
   }
 
   const saveProfile = async () => {
-    console.log('Saving pressed')
-    console.log('user:', user?.uid)
-    console.log('onboardingData:', onboardingData)
     if (!user) {
       Alert.alert('Error', 'No logged-in user found.')
       return

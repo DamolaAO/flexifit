@@ -1,7 +1,8 @@
-import { StyleSheet } from 'react-native'
+import { Alert, StyleSheet } from 'react-native'
 import React from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { useRouter } from 'expo-router'
+import appJson from '../../app.json'
 
 import ThemedView from '../../components/ThemedView'
 import ThemedCard from '../../components/ThemedCard'
@@ -23,11 +24,25 @@ const info = () => {
     }
   }
 
+  const handleAboutMe = () => {
+    Alert.alert(
+      'About FlexiFit',
+      `App Name: FlexiFit\nVersion: ${appJson.expo.version}`
+    )
+  }
+
   return (
     <ThemedView style={styles.container} safe={true}>
         
       <ThemedText title={true} style={styles.title}>Info</ThemedText>
+
       <Spacer />
+
+      <ThemedButton style={{ alignSelf: 'center' }} onPress={handleAboutMe}>
+        <ThemedText>About</ThemedText>
+      </ThemedButton>
+
+      <Spacer height={10}/>
 
       <ThemedButton style={{ alignSelf: 'center' }} onPress={handleLogout}>
         <ThemedText>Logout</ThemedText>
