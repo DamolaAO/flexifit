@@ -117,7 +117,6 @@ const WorkoutLog = () => {
                 setSelectedExercises([])
                 router.back()
             } catch (error) {
-                console.log('Error saving workout:', error)
             }
             }
         )

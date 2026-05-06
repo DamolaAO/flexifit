@@ -69,7 +69,6 @@ const ManageWeightLogs = () => {
 
       Alert.alert('Deleted', 'Weight log removed.')
     } catch (error) {
-      console.log('Error deleting weight log:', error)
       Alert.alert('Error', 'Could not delete this weight log.')
     }
   }

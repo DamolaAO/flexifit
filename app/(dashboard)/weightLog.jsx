@@ -63,7 +63,6 @@ const WeightLog = () => {
       Alert.alert('Saved', 'Your weight has been logged.')
       router.back()
     } catch (error) {
-      console.log('Error saving weight:', error)
       Alert.alert('Save failed', 'Could not save your weight. Please try again.')
     } finally {
       setSaving(false)
