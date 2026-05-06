@@ -109,7 +109,7 @@ const WorkoutLog = () => {
                 }))
                 await addDoc(collection(db, 'users', user.uid, 'workoutLogs'), {
                     title: finalWorkoutTitle,
-                    date: new Date().toLocaleDateString(),
+                    date: new Date().toLocaleDateString('en-CA'),
                     exercises: cleanedExercises,
                     createdAt: serverTimestamp(),
                 })

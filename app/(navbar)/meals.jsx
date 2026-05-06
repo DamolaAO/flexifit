@@ -1,7 +1,7 @@
 import { StyleSheet, ScrollView, View, Pressable } from 'react-native'
 import React, { useCallback, useState } from 'react'
 import { useRouter, useFocusEffect } from 'expo-router'
-import { collection, getDocs, orderBy, query, doc, deleteDoc } from 'firebase/firestore'
+import { collection, getDocs, orderBy, query, doc, deleteDoc, getDoc } from 'firebase/firestore'
 
 import { db } from '../../firebase/firebaseConfig'
 import { useAuth } from '../../hooks/useAuth'
@@ -14,12 +14,18 @@ import Spacer from '../../components/Spacer'
 const mealSections = ['Breakfast', 'Lunch', 'Dinner',  'Snacks']
 const mealColours = {Breakfast: 'orange', Lunch: 'green', Dinner: '#800020', Snacks: 'purple',}
 
+const getDateString = (date) => {
+  return date.toLocaleDateString('en-CA')
+}
+
 const Meals = () => {
   const router = useRouter()
   const { user } = useAuth()
 
+  const [profile, setProfile] = useState(null)
   const [meals, setMeals] = useState([])
   const [loading, setLoading] = useState(true)
+  const [selectedDate, setSelectedDate] = useState(new Date())
 
   useFocusEffect(
     useCallback(() => {
@@ -31,7 +37,6 @@ const Meals = () => {
 
           const mealsQuery = query(
             collection(db, 'users', user.uid, 'mealLogs'),
-            orderBy('createdAt', 'desc')
           )
 
           const snapshot = await getDocs(mealsQuery)
@@ -42,6 +47,13 @@ const Meals = () => {
           }))
 
           setMeals(mealData)
+
+          const profileRef = doc(db, 'users', user.uid)
+          const profileSnap = await getDoc(profileRef)
+
+          if (profileSnap.exists()) {
+            setProfile(profileSnap.data())
+          }
         } catch (error) {
           console.log('Error fetching meals:', error)
         } finally {
@@ -53,10 +65,10 @@ const Meals = () => {
     }, [user])
   )
 
-  const today = new Date().toISOString().split('T')[0]
+  const selectedDateString = getDateString(selectedDate)
 
   const todayMeals = meals.filter((meal) => {
-    return meal.date === today
+    return meal.date === selectedDateString
   })
 
   const totalCalories = todayMeals.reduce((sum, meal) => {
@@ -67,11 +79,20 @@ const Meals = () => {
     return sum + Number(meal.protein || 0)
   }, 0)
 
+  const totalCarbs = todayMeals.reduce((sum, meal) => {
+    return sum + Number(meal.carbs || 0)
+  }, 0)
+
+  const totalFat = todayMeals.reduce((sum, meal) => {
+    return sum + Number(meal.fat || 0)
+  }, 0)
+
   const openMealLog = (mealType) => {
     router.push({
       pathname: '/(meals)/mealLog',
       params: {
         mealType,
+        date: selectedDateString,
       },
     })
   }
@@ -92,9 +113,58 @@ const Meals = () => {
     }
   }
 
+  const goToPreviousDay = () => {
+    const newDate = new Date(selectedDate)
+    newDate.setDate(newDate.getDate() - 1)
+    setSelectedDate(newDate)
+  }
+
+  const goToNextDay = () => {
+    const newDate = new Date(selectedDate)
+    newDate.setDate(newDate.getDate() + 1)
+    setSelectedDate(newDate)
+  }
+
+  const weight = Number(profile?.weight || 0)
+  const height = Number(profile?.height || 0)
+  const age = Number(profile?.age || 0)
+  const goal = String(profile?.fitnessGoal || '').toLowerCase()
+  const fitnessLevel = String(profile?.fitnessLevel || '').toLowerCase()
+
+  const activityMultiplier =
+    fitnessLevel.includes('beginner') ? 1.2 :
+    fitnessLevel.includes('intermediate') ? 1.5 :
+    fitnessLevel.includes('advanced') ? 1.7 :
+    1.2
+
+  const maintenanceCalories = weight && height && age
+    ? Math.round(((10 * weight) + (6.25 * height) - (5 * age) + 5) * activityMultiplier)
+    : 0
+
+  const calorieTarget = goal.includes('lose')
+    ? maintenanceCalories - 500
+    : maintenanceCalories
+
+  const proteinTarget = goal.includes('build')
+    ? Number((weight * 0.75).toFixed(1))
+    : 0
+
   return (
     <ThemedView style={styles.container} safe={true}>
       <ScrollView contentContainerStyle={styles.content}>
+        <View style={styles.dateRow}>
+          <Pressable onPress={goToPreviousDay}>
+            <ThemedText style={styles.dateArrow}>‹</ThemedText>
+          </Pressable>
+
+          <ThemedText style={styles.dateText}>
+            {selectedDate.toDateString()}
+          </ThemedText>
+
+          <Pressable onPress={goToNextDay}>
+            <ThemedText style={styles.dateArrow}>›</ThemedText>
+          </Pressable>
+        </View>
         <ThemedText title={true} style={styles.title}>
           Food Diary
         </ThemedText>
@@ -166,7 +236,10 @@ const Meals = () => {
                           </ThemedText>
 
                           <ThemedText style={styles.mealDetails}>
-                            {meal.calories || 0} kcal • {meal.protein || 0}g protein
+                            Portion: {meal.portion || 100}g
+                          </ThemedText>
+                          <ThemedText style={styles.mealDetails}>
+                            {meal.calories || 0} kcal | {meal.protein || 0}g protein | {meal.carbs || 0}g carbs | {meal.fat || 0}g fat
                           </ThemedText>
                         </View>
 
@@ -195,22 +268,22 @@ const Meals = () => {
 
           <View style={styles.summaryRow}>
             <ThemedText>Total calories</ThemedText>
-            <ThemedText>{totalCalories} kcal</ThemedText>
+            <ThemedText> {totalCalories} / {calorieTarget || '—'} kcal</ThemedText>
           </View>
 
           <View style={styles.summaryRow}>
             <ThemedText>Total protein</ThemedText>
-            <ThemedText>{totalProtein}g</ThemedText>
+            <ThemedText>{totalProtein.toFixed(1)} / {proteinTarget ? proteinTarget.toFixed(1) : '—'}g</ThemedText>
           </View>
 
           <View style={styles.summaryRow}>
-            <ThemedText>Water</ThemedText>
-            <ThemedText>0 cups</ThemedText>
+            <ThemedText>Total carbs</ThemedText>
+            <ThemedText>{totalCarbs.toFixed(1)}g</ThemedText>
           </View>
 
           <View style={styles.summaryRow}>
-            <ThemedText>Macros</ThemedText>
-            <ThemedText>Coming soon</ThemedText>
+            <ThemedText>Total fat</ThemedText>
+            <ThemedText>{totalFat.toFixed(1)}g</ThemedText>
           </View>
         </ThemedCard>
 
@@ -318,6 +391,23 @@ const styles = StyleSheet.create({
 
   deleteText: {
     fontSize: 22,
+    fontWeight: '700',
+  },
+  dateRow: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 16,
+  },
+
+  dateArrow: {
+    fontSize: 32,
+    fontWeight: 'bold',
+  },
+
+  dateText: {
+    fontSize: 16,
     fontWeight: '700',
   },
 })

@@ -12,7 +12,7 @@ import Spacer from '../../components/Spacer'
 const FoodSearch = () => {
     const router = useRouter()
     const navigation = useNavigation()
-    const { mealType } = useLocalSearchParams()
+    const { mealType, date } = useLocalSearchParams()
 
     const [search, setSearch] = useState('')
     const [foods, setFoods] = useState([])
@@ -72,6 +72,7 @@ const FoodSearch = () => {
             pathname: '/(meals)/mealLog',
             params: {
                 mealType,
+                date,
                 foodName: food.product_name || '',
                 calories: String(food.nutriments?.['energy-kcal_100g'] || 0),
                 protein: String(food.nutriments?.proteins_100g || 0),
@@ -92,6 +93,12 @@ const FoodSearch = () => {
             Search UK foods and add nutrition values to your meal log.
             </ThemedText>
 
+            <Spacer height={30}/>
+
+            <ThemedText style={styles.nutrientMsg}>
+                Nutrition values are based on 100g and adjusted by portion size.
+            </ThemedText>
+
             <Spacer height={20} />
 
             <ThemedCard style={styles.fullCard}>
@@ -101,14 +108,14 @@ const FoodSearch = () => {
                 onChangeText={setSearch}
                 onSubmitEditing={searchFoods}
             />
-
-            <Spacer height={12} />
+            </ThemedCard>
 
             <ThemedButton onPress={searchFoods}>
                 <ThemedText>Search</ThemedText>
             </ThemedButton>
-            </ThemedCard>
 
+            <Spacer height={30} />
+            
             {loading && (
             <ThemedText>Searching...</ThemedText>
             )}
@@ -177,4 +184,8 @@ const styles = StyleSheet.create({
         opacity: 0.75,
         marginTop: 4,
     },
+    nutrientMsg: {
+        opacity: 0.5,
+        textAlign: 'center',
+    }
 })

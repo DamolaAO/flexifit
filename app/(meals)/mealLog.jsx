@@ -64,9 +64,10 @@ const DropdownSelect = ({ label,
 const MealLog = () => {
     const navigation = useNavigation()
     const { user } = useAuth()
-    const { mealType: selectedMealType, mealId, foodName, calories: foodCalories, protein: foodProtein, carbs: foodCarbs, fat: foodFat } = useLocalSearchParams()
+    const { mealType: selectedMealType, mealId, date, foodName, calories: foodCalories, protein: foodProtein, carbs: foodCarbs, fat: foodFat } = useLocalSearchParams()
     const router = useRouter()
 
+    const [portion, setPortion] = useState('100')
     const [mealName, setMealName] = useState('')
     const [calories, setCalories] = useState('')
     const [protein, setProtein] = useState('')
@@ -74,6 +75,11 @@ const MealLog = () => {
     const [fat, setFat] = useState('')
     const [mealType, setMealType] = useState(selectedMealType || '')
     const [loading, setLoading] = useState(false)
+
+    const [baseCalories, setBaseCalories] = useState('')
+    const [baseProtein, setBaseProtein] = useState('')
+    const [baseCarbs, setBaseCarbs] = useState('')
+    const [baseFat, setBaseFat] = useState('')
 
     const mealTypeOptions = [
         { value: 'Breakfast', label: 'Breakfast' },
@@ -96,12 +102,29 @@ const MealLog = () => {
     useEffect(() => {
         if (foodName) {
             setMealName(foodName)
+
+            setBaseCalories(foodCalories || '')
+            setBaseProtein(foodProtein || '')
+            setBaseCarbs(foodCarbs || '')
+            setBaseFat(foodFat || '')
+
             setCalories(foodCalories || '')
             setProtein(foodProtein || '')
             setCarbs(foodCarbs || '')
             setFat(foodFat || '')
         }
         }, [foodName, foodCalories, foodProtein, foodCarbs, foodFat])
+
+    useEffect(() => {
+        if (!baseCalories && !baseProtein && !baseCarbs && !baseFat) return
+
+        const multiplier = Number(portion || 0) / 100
+
+        setCalories(String(Math.round((Number(baseCalories) || 0) * multiplier)))
+        setProtein(String(((Number(baseProtein) || 0) * multiplier).toFixed(1)))
+        setCarbs(String(((Number(baseCarbs) || 0) * multiplier).toFixed(1)))
+        setFat(String(((Number(baseFat) || 0) * multiplier).toFixed(1)))
+    }, [portion, baseCalories, baseProtein, baseCarbs, baseFat])
 
     useEffect(() => {
         const fetchMeal = async () => {
@@ -116,10 +139,21 @@ const MealLog = () => {
                 if (mealSnap.exists()) {
                     const mealData = mealSnap.data()
 
+                    const savedPortion = Number(mealData.portion || 100)
+                    const multiplier = savedPortion / 100
+
                     setMealName(mealData.name || '')
                     setMealType(mealData.mealType || '')
+                    setPortion(String(savedPortion))
                     setCalories(String(mealData.calories || ''))
                     setProtein(String(mealData.protein || ''))
+                    setCarbs(String(mealData.carbs || ''))
+                    setFat(String(mealData.fat || ''))
+
+                    setBaseCalories(String(mealData.baseCalories || (Number(mealData.calories || 0) / multiplier)))
+                    setBaseProtein(String(mealData.baseProtein || (Number(mealData.protein || 0) / multiplier)))
+                    setBaseCarbs(String(mealData.baseCarbs || (Number(mealData.carbs || 0) / multiplier)))
+                    setBaseFat(String(mealData.baseFat || (Number(mealData.fat || 0) / multiplier)))
                 }
             } catch (error) {
                 Alert.alert('Load failed', 'Could not load meal.')
@@ -138,6 +172,10 @@ const MealLog = () => {
             Alert.alert('Missing meal name', 'Please enter a meal name.')
             return
         }
+        if (!portion.trim() || Number(portion) <= 0) {
+            Alert.alert('Invalid portion size.', 'Please enter a portion size greater than 0g.')
+            return
+        }
 
         try {
             if (isEditing) {
@@ -146,21 +184,35 @@ const MealLog = () => {
                 await updateDoc(mealRef, {
                     name: mealName.trim(),
                     mealType: mealType.trim() || 'Meal',
+                    portion: Number(portion) || 100,
                     calories: Number(calories) || 0,
                     protein: Number(protein) || 0,
+                    carbs: Number(carbs) || 0,
+                    fat: Number(fat) || 0,
+                    baseCalories: Number(baseCalories) || 0,
+                    baseProtein: Number(baseProtein) || 0,
+                    baseCarbs: Number(baseCarbs) || 0,
+                    baseFat: Number(baseFat) || 0,
                 })
             } else {
                 await addDoc(collection(db, 'users', user.uid, 'mealLogs'), {
                     name: mealName.trim(),
                     mealType: mealType.trim() || 'Meal',
+                    portion: Number(portion) || 100,
                     calories: Number(calories) || 0,
                     protein: Number(protein) || 0,
-                    date: new Date().toISOString().split('T')[0],
-                    createdAt: serverTimestamp(),
+                    carbs: Number(carbs) || 0,
+                    fat: Number(fat) || 0,
+                    baseCalories: Number(baseCalories) || 0,
+                    baseProtein: Number(baseProtein) || 0,
+                    baseCarbs: Number(baseCarbs) || 0,
+                    baseFat: Number(baseFat) || 0,
+                    date: date || new Date().toLocaleDateString('en-Ca'),
                 })
             }
 
-        navigation.goBack()
+        router.replace('/(navbar)/meals')
+
         } catch (error) {
             Alert.alert('Save failed', 'Could not save meal.')
         }
@@ -205,10 +257,12 @@ const MealLog = () => {
                     <ThemedText>Loading meal...</ThemedText>
                     ) : (
                         <>
-                        <ThemedButton onPress={() => router.push({ pathname: '/(meals)/foodSearch', params: { mealType } })}>
+                        <ThemedButton onPress={() => router.push({ pathname: '/(meals)/foodSearch', params: { mealType, date } })}>
                         <ThemedText>Search Food</ThemedText>
                         </ThemedButton>
+
                         <Spacer height={16} />
+
                         <ThemedText>Meal Name</ThemedText>
                         <ThemedTextInput placeholder="Chicken wrap" value={mealName} onChangeText={setMealName} />
 
@@ -225,6 +279,16 @@ const MealLog = () => {
 
                         <Spacer height={12} />
 
+                        <ThemedText>Portion Size (g)</ThemedText>
+                        <ThemedTextInput
+                            placeholder="100"
+                            keyboardType="numeric"
+                            value={portion}
+                            onChangeText={(text) => setPortion(text.replace(/[^0-9.]/g, ''))}
+                        />
+
+                        <Spacer height={12} />
+
                         <ThemedText>Calories</ThemedText>
                         <ThemedTextInput
                             placeholder="540"
@@ -233,17 +297,29 @@ const MealLog = () => {
                             onChangeText={(text) => setCalories(text.replace(/[^0-9]/g, ''))}
                         />
 
-                        <Spacer height={12} />
-
                         <ThemedText>Protein (g)</ThemedText>
                         <ThemedTextInput
-                            placeholder="42"
+                            placeholder="20"
                             keyboardType="numeric"
                             value={protein}
                             onChangeText={(text) => setProtein(text.replace(/[^0-9]/g, ''))}
                         />
 
-                        <Spacer height={20} />
+                        <ThemedText>Carbs (g)</ThemedText>
+                        <ThemedTextInput
+                            placeholder="30"
+                            keyboardType="numeric"
+                            value={carbs}
+                            onChangeText={(text) => setCarbs(text.replace(/[^0-9]/g, ''))}
+                        />
+
+                        <ThemedText>Fat (g)</ThemedText>
+                        <ThemedTextInput
+                            placeholder="15"
+                            keyboardType="numeric"
+                            value={fat}
+                            onChangeText={(text) => setFat(text.replace(/[^0-9]/g, ''))}
+                        />
 
                         <ThemedButton onPress={saveMeal}>
                             <ThemedText>{isEditing ? 'Update Meal' : 'Save Meal'}</ThemedText>

@@ -18,6 +18,8 @@ const Dashboard = () => {
   const { user } = useAuth()
   const [profile, setProfile] = useState(null)
   const [weightLogs, setWeightLogs] = useState([])
+  const [mealLogs, setMealLogs] = useState([])
+  const [workoutLogs, setWorkoutLogs] = useState([])
 
   useFocusEffect(
     useCallback(() => {
@@ -45,6 +47,24 @@ const Dashboard = () => {
         }))
 
         setWeightLogs(logs)
+
+        const mealSnapshot = await getDocs(collection(db, 'users', user.uid, 'mealLogs'))
+
+        const meals = mealSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }))
+
+        setMealLogs(meals)
+
+        const workoutSnapshot = await getDocs(collection(db, 'users', user.uid, 'workoutLogs'))
+
+        const workouts = workoutSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }))
+
+        setWorkoutLogs(workouts)
       }
 
       loadProfile()
@@ -61,6 +81,42 @@ const Dashboard = () => {
       ? currentWeight - startingWeight
       : null
 
+  const today = new Date().toLocaleDateString('en-CA')
+
+  const todayMeals = mealLogs.filter((meal) => meal.date === today)
+  const todayWorkouts = workoutLogs.filter((workout) => workout.date === today)
+
+  const loggedCalories = todayMeals.reduce((sum, meal) => {
+    return sum + Number(meal.calories || 0)
+  }, 0)
+
+  const loggedProtein = todayMeals.reduce((sum, meal) => {
+    return sum + Number(meal.protein || 0)
+  }, 0)
+
+  const loggedFat = todayMeals.reduce((sum, meal) => {
+    return sum + Number(meal.fat || 0)
+  }, 0)
+
+  const weight = Number(profile?.weight || 0)
+  const height = Number(profile?.height || 0)
+  const age = Number(profile?.age || 0)
+  const goal = String(profile?.fitnessGoal || '').toLowerCase()
+
+  const maintenanceCalories = weight && height && age
+    ? Math.round(((10 * weight) + (6.25 * height) - (5 * age) + 5) * 1.4)
+    : 0
+
+  const calorieTarget = goal.includes('lose')
+    ? maintenanceCalories - 500
+    : maintenanceCalories
+
+  const caloriesLeft = calorieTarget
+    ? calorieTarget - loggedCalories
+    : 0
+
+  const todaysWorkout = todayWorkouts[0]
+
   return (
     <ThemedView style={styles.container} safe={true}>
       <ScrollView contentContainerStyle={styles.content}>
@@ -76,26 +132,26 @@ const Dashboard = () => {
 
         <View style={styles.grid}>
           <ThemedCard style={styles.smallCard}>
-            <ThemedText style={styles.cardTitle}>Calories</ThemedText>
-            <ThemedText style={styles.cardValue}>—</ThemedText>
-            <ThemedText style={styles.cardSubtext}>Not logged yet</ThemedText>
+            <ThemedText style={[styles.cardTitle, { color: 'orange'}]}>Calories</ThemedText>
+            <ThemedText style={[styles.cardValue, { color: 'orange'}]}>{caloriesLeft}</ThemedText>
+            <ThemedText style={styles.cardSubtext}>calories left</ThemedText>
           </ThemedCard>
 
           <ThemedCard style={styles.smallCard}>
-            <ThemedText style={styles.cardTitle}>Protein</ThemedText>
-            <ThemedText style={styles.cardValue}>—</ThemedText>
-            <ThemedText style={styles.cardSubtext}>Not logged yet</ThemedText>
+            <ThemedText style={[styles.cardTitle, { color: 'green'}]}>Protein</ThemedText>
+            <ThemedText style={[styles.cardValue, { color: 'green'}]}>{loggedProtein.toFixed(1)}g</ThemedText>
+            <ThemedText style={styles.cardSubtext}>protein logged</ThemedText>
           </ThemedCard>
 
           <ThemedCard style={styles.smallCard}>
-            <ThemedText style={styles.cardTitle}>Water</ThemedText>
-            <ThemedText style={styles.cardValue}>—</ThemedText>
-            <ThemedText style={styles.cardSubtext}>Not logged yet</ThemedText>
+            <ThemedText style={[styles.cardTitle, { color: 'blue'}]}>Fat</ThemedText>
+            <ThemedText style={[styles.cardValue, { color: 'blue'}]}>{loggedFat.toFixed(1)}g</ThemedText>
+            <ThemedText style={styles.cardSubtext}>fat logged</ThemedText>
           </ThemedCard>
 
           <ThemedCard style={styles.smallCard}>
-            <ThemedText style={styles.cardTitle}>Steps</ThemedText>
-            <ThemedText style={styles.cardValue}>—</ThemedText>
+            <ThemedText style={[styles.cardTitle, { color: 'red'}]}>Steps</ThemedText>
+            <ThemedText style={[styles.cardValue, { color: 'red'}]}>—</ThemedText>
             <ThemedText style={styles.cardSubtext}>Not logged yet</ThemedText>
           </ThemedCard>
         </View>
@@ -103,16 +159,16 @@ const Dashboard = () => {
         <Spacer height={16} />
 
         <ThemedCard style={styles.fullCard}>
-          <ThemedText style={styles.cardTitle}>Today’s Workout</ThemedText>
-          <ThemedText>No workout planned yet.</ThemedText>
-        </ThemedCard>
+        <ThemedText style={styles.cardTitle}>Today’s Workout</ThemedText>
 
-        <ThemedCard style={styles.fullCard}>
-          <ThemedText style={styles.cardTitle}>Meal Progress</ThemedText>
-          <ThemedText>Breakfast: Pending</ThemedText>
-          <ThemedText>Lunch: Pending</ThemedText>
-          <ThemedText>Dinner: Pending</ThemedText>
-        </ThemedCard>
+        {todaysWorkout ? (
+          <ThemedText style={styles.workoutLogged}>
+            {todaysWorkout.title || 'Workout logged'}
+          </ThemedText>
+        ) : (
+          <ThemedText>No workout logged.</ThemedText>
+        )}
+      </ThemedCard>
 
         <ThemedCard style={styles.fullCard}>
           <ThemedText style={styles.cardTitle}>Weight Progress</ThemedText>
@@ -232,6 +288,11 @@ const styles = StyleSheet.create({
 
   weightButtonText: {
     fontSize: 15,
+    fontWeight: '700',
+  },
+
+  workoutLogged: {
+    color: 'green',
     fontWeight: '700',
   },
 })
