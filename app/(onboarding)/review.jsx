@@ -68,6 +68,7 @@ const Review = () => {
   return (
     <ThemedView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
+        <Spacer height={80}/>
         <ThemedText type="title" style={styles.title}>
           Review your details
         </ThemedText>
@@ -117,7 +118,7 @@ const Review = () => {
 
         <Spacer height={30} />
 
-        <ThemedButton onPress={saveProfile}>
+        <ThemedButton style={{alignSelf: 'center'}} onPress={saveProfile}>
           <ThemedText>{saving ? 'Saving...' : 'Confirm and continue'}</ThemedText>
         </ThemedButton>
       </ScrollView>
@@ -146,6 +147,8 @@ export default Review
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   content: {
     flexGrow: 1,

@@ -96,7 +96,7 @@ const Meals = () => {
     <ThemedView style={styles.container} safe={true}>
       <ScrollView contentContainerStyle={styles.content}>
         <ThemedText title={true} style={styles.title}>
-          Meals
+          Food Diary
         </ThemedText>
 
         <ThemedText style={styles.subtitle}>

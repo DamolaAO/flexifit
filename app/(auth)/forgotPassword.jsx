@@ -1,6 +1,7 @@
-import { StyleSheet, Alert} from 'react-native'
+import { StyleSheet, Alert, TouchableWithoutFeedback, Keyboard } from 'react-native'
 import React from 'react'
 import { useRouter } from 'expo-router'
+
 
 import ThemedView from '../../components/ThemedView'
 import ThemedText from '../../components/ThemedText'
@@ -34,24 +35,26 @@ const forgotPassword = () => {
   }
 
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText title={ true }>
-        Forgot Password
-      </ThemedText>
-      <Spacer height={50} />
+    <TouchableWithoutFeedback onPress={() => {Keyboard.dismiss()}}>
+      <ThemedView style={styles.container}>
+        <ThemedText title={ true }>
+          Forgot Password
+        </ThemedText>
+        <Spacer height={50} />
 
-      <ThemedTextInput
-          style={{ width: '80%', marginBottom: 20 }}
-          placeholder="Email"
-          keyboardType="email-address"
-          autoCapitalize="none"
-          onChangeText={setEmail}
-          value={email}
-        />
-      <ThemedButton onPress={handleSubmit} loading={loading}>
-        <ThemedText>Send Reset Link</ThemedText>
-      </ThemedButton>
-    </ThemedView>
+        <ThemedTextInput
+            style={{ width: '80%', marginBottom: 20 }}
+            placeholder="Email"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            onChangeText={setEmail}
+            value={email}
+          />
+        <ThemedButton style={{ alignSelf: 'center' }} onPress={handleSubmit} loading={loading}>
+          <ThemedText>Send Reset Link</ThemedText>
+        </ThemedButton>
+      </ThemedView>
+    </TouchableWithoutFeedback>
   )
 }
 

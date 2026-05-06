@@ -113,7 +113,7 @@ const OnboardingBodyInfo = () => {
 
         <Spacer height={35} />
 
-        <ThemedButton onPress={onContinue}>
+        <ThemedButton style={{alignSelf: 'center'}} onPress={onContinue}>
           <ThemedText>{isEditMode ? "Save Changes" : "Continue"}</ThemedText>
         </ThemedButton>
       </ThemedView>

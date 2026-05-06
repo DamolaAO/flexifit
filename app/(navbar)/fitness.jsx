@@ -64,7 +64,7 @@ const Fitness = () => {
         )
       }} scrollEventThrottle={16}>
         <ThemedText title={true} style={styles.title}>
-          Fitness
+          Workout Journal
         </ThemedText>
 
         <ThemedText style={styles.subtitle}>

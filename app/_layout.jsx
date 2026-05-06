@@ -4,10 +4,15 @@ import { useState, useEffect } from 'react'
 import { Slot, Stack, useRouter } from 'expo-router'
 import { Colours } from '../constants/Colours' // Colours.js file for color constants
 import { StatusBar } from 'expo-status-bar'
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native'
+
 import { AuthProvider } from '../context/AuthContext'
 import { useAuth } from '../hooks/useAuth'
+
 import ThemedSplash from '../components/ThemedSplash'
 import ThemedView from '../components/ThemedView'
+import ThemedLogo from '../components/ThemedLogo'
+
 import { doc, getDoc } from 'firebase/firestore'
 import { db } from "../firebase/firebaseConfig";
 
@@ -47,12 +52,12 @@ function AuthGate() {
     setShowSplash(true); // keep overlay up while routing
 
     if (!user) {
-      router.replace("/(auth)/login")
+      router.replace("/")
       const t = setTimeout(() => setShowSplash(false), 500)
       return () => clearTimeout(t)
     }
 
-    // Wait until Firestore profile has been fetched at least once
+    // Wait until Firestore profile has been fetched
     if (loadingDoc) return
 
     const profile = userDoc
@@ -87,7 +92,36 @@ const RootLayout = () => {
             headerStyle: { backgroundColor: theme.navBackground },
             headerTintColor: theme.text,
         }}>
-            <Stack.Screen name="(navbar)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="(navbar)"
+              options={({ route }) => {
+                const routeName = getFocusedRouteNameFromRoute(route) ?? 'dashboard'
+
+                const titles = {
+                  dashboard: 'Dashboard',
+                  fitness: 'Fitness',
+                  meals: 'Meals',
+                  chatbot: 'Chatbot',
+                  info: 'Info',
+                }
+
+                return {
+                  headerShown: true,
+                  headerBackVisible: false,
+                  headerTitle: titles[routeName] ?? 'Dashboard',
+                  headerLeft: () => (
+                    <ThemedLogo
+                      style={{
+                        width: 90,
+                        height: 35,
+                        resizeMode: 'contain',
+                      }}
+                    />
+                  ),
+                }
+              }}
+            />
+
             <Stack.Screen name="(auth)" options={{ headerShown: false }} />
             <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
             <Stack.Screen name="index" options={{ title: 'Home', headerBackVisible: false, headerLeft: () => null, gestureEnabled: false }} />

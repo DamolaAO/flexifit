@@ -19,6 +19,10 @@ const register = () => {
 
     const handleSubmit = async () => {
       try {
+        if (password.length < 6) {
+          Alert.alert("Password must be at least 6 characters")
+          return
+        }
         await register(email, password);
       } catch (error) {
         Alert.alert("Registration failed", error.message);
@@ -28,10 +32,9 @@ const register = () => {
   return (
     <TouchableWithoutFeedback onPress={() => {Keyboard.dismiss()}}>
       <ThemedView style={styles.container}>
-          
           <Spacer />
           <ThemedText title={true}>
-              Register as new User
+            Register as new User
           </ThemedText>
           <Spacer height={80} />
 
@@ -53,7 +56,7 @@ const register = () => {
           />
           <Spacer height={10} />
 
-          <ThemedButton style={styles.btn} onPress={handleSubmit}>
+          <ThemedButton style={{ alignSelf: 'center' }} onPress={handleSubmit}>
               <ThemedText>Register</ThemedText>
           </ThemedButton>
           <Spacer height={10} />

@@ -61,7 +61,7 @@ const OnboardingIntro = () => {
           </AnimatedThemedText>
           <Spacer height={30} />
 
-          <AnimatedThemedButton onPress={handleStart} style={{ opacity: btnFade }}>
+          <AnimatedThemedButton onPress={handleStart} style={{alignSelf: 'center', opacity: btnFade }}>
               <ThemedText>Get Started</ThemedText>
           </AnimatedThemedButton>
       </ThemedView>

@@ -29,7 +29,7 @@ const info = () => {
       <ThemedText title={true} style={styles.title}>Info</ThemedText>
       <Spacer />
 
-      <ThemedButton onPress={handleLogout}>
+      <ThemedButton style={{ alignSelf: 'center' }} onPress={handleLogout}>
         <ThemedText>Logout</ThemedText>
       </ThemedButton>
 

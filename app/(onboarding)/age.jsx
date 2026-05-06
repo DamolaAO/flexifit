@@ -64,7 +64,6 @@ const OnboardingAge = () => {
   const isEditMode = editMode === 'true';
 
   const { onboardingData, updateOnboardingData } = useOnboarding()
-  console.log('Onboarding Data:', onboardingData); // FOR DEBUGGING PURPOSES **** REMOVE 
 
   useEffect(() => {
     navigation.setOptions({ headerShown: false });
@@ -177,7 +176,7 @@ const OnboardingAge = () => {
       </View>
 
       <Spacer height={30} />
-      <ThemedButton onPress={onContinue}>
+      <ThemedButton style={{alignSelf: 'center'}} onPress={onContinue}>
         <ThemedText>{isEditMode ? "Save Changes" : "Continue"}</ThemedText>
       </ThemedButton>
     </ThemedView>
@@ -213,7 +212,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     justifyContent: 'center',
   },
-  ddValue: { fontSize: 16 },
+  ddValue: { 
+    fontSize: 16 
+  },
 
   backdrop: {
     flex: 1,

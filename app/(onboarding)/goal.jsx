@@ -87,7 +87,7 @@ const OnboardingFitnessGoal = () => {
 
       <Spacer height={30} />
 
-      <ThemedButton onPress={onContinue} disabled={!isComplete}>
+      <ThemedButton style={{alignSelf: 'center'}} onPress={onContinue} disabled={!isComplete}>
         <ThemedText>{isEditMode ? "Save Changes" : "Continue"}</ThemedText>
       </ThemedButton>
     </ThemedView>
@@ -116,6 +116,7 @@ const styles = StyleSheet.create({
   goalButton: {
     width: '80%',
     marginBottom: 12,
+    alignSelf: 'center'
   },
   selectedButton: {
     opacity: 0.65,

@@ -27,8 +27,14 @@ const Login = () => {
   }, [user, router])
 
   const handleSubmit =  async () => {
+    if (!email || !password) {
+      Alert.alert("Missing details", "Please enter both email and password.")
+      return
+    }
     try {
+
       await login(email, password)
+      
     } catch (err) {
       if (err.code === "auth/invalid-credential") {
         Alert.alert("Login failed", "Invalid email or password.")
@@ -119,6 +125,7 @@ const styles = StyleSheet.create({
   btn: {
     padding: 16,
     borderRadius: 5,
+    alignSelf: 'center',
   },
   pressed: {
     opacity: 0.25,
